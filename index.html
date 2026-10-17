@@ -247,12 +247,14 @@
   </div>
 
   <script>
+    const fallbackImage = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='100%25' height='100%25' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='20' fill='%2316a34a' text-anchor='middle' dominant-baseline='middle'%3EFrigo Frutas%3C/text%3E%3C/svg%3E";
+
     const products = [
       { id: 1, name: "Maçã Fuji (kg)", price: 8.50, oldPrice: 10.00, category: "frutas", isPromo: true, image: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80", desc: "Maçãs doces e crocantes selecionadas diariamente." },
       { id: 2, name: "Banana Prata (kg)", price: 6.00, oldPrice: null, category: "frutas", isPromo: false, image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&q=80", desc: "Bananas frescas e prontas para o consumo saudável." },
       { id: 3, name: "Polpa Acerola (400g)", price: 4.50, oldPrice: 6.00, category: "polpas", isPromo: true, image: "https://images.unsplash.com/photo-1610970881699-44a5587cabec?auto=format&fit=crop&w=400&q=80", desc: "Polpa 100% natural, rica em Vitamina C sem conservantes." },
-      { id: 4, name: "Polpa Maracujá (400g)", price: 6.50, oldPrice: null, category: "polpas", isPromo: false, image: "https://images.unsplash.com/photo-1543218024-57a4014d4e38?auto=format&fit=crop&w=400&q=80", desc: "Sabor intenso e acidez natural perfeita para sucos e doces." },
-      { id: 5, name: "Polpa Goiaba (400g)", price: 5.00, oldPrice: null, category: "polpas", isPromo: false, image: "https://images.unsplash.com/photo-1536590158209-e9d615d52584?auto=format&fit=crop&w=400&q=80", desc: "Polpa pura de goiaba cremosa e bem encorpada." },
+      { id: 4, name: "Polpa Maracujá (400g)", price: 6.50, oldPrice: null, category: "polpas", isPromo: false, image: "https://images.unsplash.com/photo-1546548970-71785318a17b?auto=format&fit=crop&w=400&q=80", desc: "Sabor intenso e acidez natural perfeita para sucos e doces." },
+      { id: 5, name: "Polpa Goiaba (400g)", price: 5.00, oldPrice: null, category: "polpas", isPromo: false, image: "https://images.unsplash.com/photo-1528821128474-27f963b072b7?auto=format&fit=crop&w=400&q=80", desc: "Polpa pura de goiaba cremosa e bem encorpada." },
       { id: 6, name: "Cenoura Fresca (kg)", price: 4.50, oldPrice: null, category: "legumes", isPromo: false, image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=400&q=80", desc: "Cenouras crocantes e selecionadas ideais para saladas." },
       { id: 7, name: "Manga Palmer (kg)", price: 7.00, oldPrice: 8.50, category: "frutas", isPromo: true, image: "https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=400&q=80", desc: "Manga Palmer doce, sem fiapos e extremamente suculenta." },
       { id: 8, name: "Melancia Inteira (Unid)", price: 15.00, oldPrice: null, category: "frutas", isPromo: false, image: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=400&q=80", desc: "Melancia vermelhinha e super doce para refrescar o seu dia." }
@@ -283,7 +285,7 @@
           <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition relative">
             ${p.isPromo ? `<span class="absolute top-2 right-2 bg-red-500 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider z-10 shadow">Oferta</span>` : ''}
             <div onclick="openProductModal(${p.id})" class="h-32 bg-gray-100 overflow-hidden relative cursor-pointer">
-              <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover hover:scale-105 transition duration-300">
+              <img src="${p.image}" onerror="this.src='${fallbackImage}'" alt="${p.name}" class="w-full h-full object-cover hover:scale-105 transition duration-300">
             </div>
             <div class="p-3 flex flex-col justify-between flex-grow">
               <div onclick="openProductModal(${p.id})" class="cursor-pointer">
@@ -313,7 +315,9 @@
     function openProductModal(id) {
       const p = products.find(prod => prod.id === id);
       if (!p) return;
-      document.getElementById('modal-img').src = p.image;
+      const modalImg = document.getElementById('modal-img');
+      modalImg.src = p.image;
+      modalImg.onerror = function() { this.src = fallbackImage; };
       document.getElementById('modal-cat').innerText = p.category;
       document.getElementById('modal-title').innerText = p.name;
       document.getElementById('modal-desc').innerText = p.desc;
