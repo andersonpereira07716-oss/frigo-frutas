@@ -1,26 +1,21 @@
 {
-  "name": "Frigo Frutas In House Delivery",
+  "name": "Frigo Frutas & Cia",
   "short_name": "Frigo Frutas",
-  "description": "Frutas, verduras e mais com entrega em Patos-PB",
   "start_url": "/",
-  "scope": "/",
   "display": "standalone",
+  "background_color": "#16a34a",
+  "theme_color": "#16a34a",
   "orientation": "portrait",
-  "background_color": "#f6f9f1",
-  "theme_color": "#0f5a1e",
-  "lang": "pt-BR",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/1625/1625048.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/1625/1625048.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
