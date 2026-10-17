@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Frigo Frutas - Hortifrúti & Polpas</title>
+  <title>Frigo Frutas - Frutas Frescas</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#16a34a">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -68,12 +68,12 @@
       <!-- Banner Destaque -->
       <section class="mb-6 bg-gradient-to-r from-green-700 to-emerald-600 rounded-2xl p-4 text-white shadow-md flex justify-between items-center">
         <div>
-          <span class="bg-yellow-400 text-green-900 font-extrabold text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider">Frete Rápido</span>
-          <h2 class="text-base font-bold mt-1">Frutas Frescas Direto para sua Mesa</h2>
+          <span class="bg-yellow-400 text-green-900 font-extrabold text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider">Especial de Frutas</span>
+          <h2 class="text-base font-bold mt-1">Frutas Frescas Selecionadas</h2>
           <p class="text-xs text-green-100 mt-0.5">Use o cupom <span class="font-bold underline">FRIGO10</span> para 10% OFF!</p>
         </div>
         <div class="text-3xl text-yellow-300 pl-2">
-          <i class="fa-solid fa-basket-shopping"></i>
+          <i class="fa-solid fa-apple-whole"></i>
         </div>
       </section>
 
@@ -81,7 +81,7 @@
       <section class="mb-6 space-y-3">
         <div class="flex gap-2">
           <div class="relative flex-grow">
-            <input type="text" id="search-input" placeholder="O que você procura hoje?" 
+            <input type="text" id="search-input" placeholder="Buscar fruta desejada..." 
                    class="w-full p-3 pl-10 rounded-xl border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-green text-sm bg-white">
             <i class="fa-solid fa-search absolute left-3 top-3.5 text-gray-400"></i>
           </div>
@@ -93,15 +93,12 @@
         </div>
 
         <div class="flex space-x-2 overflow-x-auto pb-2 scrollbar-none">
-          <button class="category-btn bg-brand-green text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap shadow" data-cat="todos">Todos</button>
+          <button class="category-btn bg-brand-green text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap shadow" data-cat="todos">Todas as Frutas</button>
           <button class="category-btn bg-white text-gray-700 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap border border-gray-200" data-cat="promocao">🔥 Ofertas</button>
-          <button class="category-btn bg-white text-gray-700 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap border border-gray-200" data-cat="frutas">Frutas</button>
-          <button class="category-btn bg-white text-gray-700 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap border border-gray-200" data-cat="polpas">Polpas</button>
-          <button class="category-btn bg-white text-gray-700 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap border border-gray-200" data-cat="legumes">Legumes</button>
         </div>
       </section>
 
-      <!-- Grid de Produtos -->
+      <!-- Grid de Frutas -->
       <section id="products-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
       </section>
     </main>
@@ -112,7 +109,7 @@
     <div class="max-w-4xl mx-auto space-y-4 text-center sm:text-left sm:flex sm:justify-between sm:items-center sm:space-y-0">
       <div>
         <h3 class="text-white font-bold text-sm flex items-center justify-center sm:justify-start gap-1.5">
-          <i class="fa-solid fa-lemon text-yellow-400"></i> Frigo Frutas Patos
+          <i class="fa-solid fa-apple-whole text-yellow-400"></i> Frigo Frutas Patos
         </h3>
         <p class="mt-1">Qualidade e frescor garantidos todos os dias.</p>
         <p class="text-gray-500 mt-0.5">Atendimento: Seg à Sáb das 07h às 18h</p>
@@ -158,7 +155,6 @@
         </div>
       </div>
 
-      <!-- Barra de Progresso de Frete Grátis -->
       <div id="free-shipping-bar" class="bg-green-50 p-2.5 text-center text-xs font-semibold text-brand-green border-b border-green-200">
         <span id="shipping-msg">Adicione produtos para calcular o frete!</span>
       </div>
@@ -205,7 +201,7 @@
 
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Observações do Pedido (Opcional):</label>
-          <input type="text" id="order-notes" placeholder="Ex: Frutas bem maduras, sem açúcar na polpa..." class="w-full p-2 border rounded-lg text-sm bg-white">
+          <input type="text" id="order-notes" placeholder="Ex: Frutas bem maduras..." class="w-full p-2 border rounded-lg text-sm bg-white">
         </div>
 
         <div>
@@ -249,15 +245,14 @@
   <script>
     const fallbackImage = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='100%25' height='100%25' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='20' fill='%2316a34a' text-anchor='middle' dominant-baseline='middle'%3EFrigo Frutas%3C/text%3E%3C/svg%3E";
 
+    // Catálogo 100% composto por Frutas
     const products = [
       { id: 1, name: "Maçã Fuji (kg)", price: 8.50, oldPrice: 10.00, category: "frutas", isPromo: true, image: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80", desc: "Maçãs doces e crocantes selecionadas diariamente." },
       { id: 2, name: "Banana Prata (kg)", price: 6.00, oldPrice: null, category: "frutas", isPromo: false, image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&q=80", desc: "Bananas frescas e prontas para o consumo saudável." },
-      { id: 3, name: "Polpa Acerola (400g)", price: 4.50, oldPrice: 6.00, category: "polpas", isPromo: true, image: "https://images.unsplash.com/photo-1610970881699-44a5587cabec?auto=format&fit=crop&w=400&q=80", desc: "Polpa 100% natural, rica em Vitamina C sem conservantes." },
-      { id: 4, name: "Polpa Maracujá (400g)", price: 6.50, oldPrice: null, category: "polpas", isPromo: false, image: "https://images.unsplash.com/photo-1546548970-71785318a17b?auto=format&fit=crop&w=400&q=80", desc: "Sabor intenso e acidez natural perfeita para sucos e doces." },
-      { id: 5, name: "Polpa Goiaba (400g)", price: 5.00, oldPrice: null, category: "polpas", isPromo: false, image: "https://images.unsplash.com/photo-1528821128474-27f963b072b7?auto=format&fit=crop&w=400&q=80", desc: "Polpa pura de goiaba cremosa e bem encorpada." },
-      { id: 6, name: "Cenoura Fresca (kg)", price: 4.50, oldPrice: null, category: "legumes", isPromo: false, image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=400&q=80", desc: "Cenouras crocantes e selecionadas ideais para saladas." },
-      { id: 7, name: "Manga Palmer (kg)", price: 7.00, oldPrice: 8.50, category: "frutas", isPromo: true, image: "https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=400&q=80", desc: "Manga Palmer doce, sem fiapos e extremamente suculenta." },
-      { id: 8, name: "Melancia Inteira (Unid)", price: 15.00, oldPrice: null, category: "frutas", isPromo: false, image: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=400&q=80", desc: "Melancia vermelhinha e super doce para refrescar o seu dia." }
+      { id: 3, name: "Manga Palmer (kg)", price: 7.00, oldPrice: 8.50, category: "frutas", isPromo: true, image: "https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=400&q=80", desc: "Manga Palmer doce, sem fiapos e extremamente suculenta." },
+      { id: 4, name: "Melancia Inteira (Unid)", price: 15.00, oldPrice: null, category: "frutas", isPromo: false, image: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=400&q=80", desc: "Melancia vermelhinha e super doce para refrescar o seu dia." },
+      { id: 5, name: "Laranja Pera (kg)", price: 5.50, oldPrice: 7.00, category: "frutas", isPromo: true, image: "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=400&q=80", desc: "Laranjas bem suculentas ideais para sucos naturais frescos." },
+      { id: 6, name: "Morango Fresco (Band)", price: 9.00, oldPrice: null, category: "frutas", isPromo: false, image: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&w=400&q=80", desc: "Morangos vermelhos e selecionados diretamente do produtor." }
     ];
 
     let currentProducts = [...products];
@@ -280,7 +275,7 @@
 
     function renderProducts(items) {
       const grid = document.getElementById('products-grid');
-      grid.innerHTML = items.length === 0 ? `<p class="col-span-full text-center text-gray-500 py-8 text-sm">Nenhum produto encontrado.</p>` :
+      grid.innerHTML = items.length === 0 ? `<p class="col-span-full text-center text-gray-500 py-8 text-sm">Nenhuma fruta encontrada.</p>` :
         items.map(p => `
           <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition relative">
             ${p.isPromo ? `<span class="absolute top-2 right-2 bg-red-500 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider z-10 shadow">Oferta</span>` : ''}
@@ -289,7 +284,7 @@
             </div>
             <div class="p-3 flex flex-col justify-between flex-grow">
               <div onclick="openProductModal(${p.id})" class="cursor-pointer">
-                <span class="text-[9px] font-bold uppercase tracking-wider text-gray-400">${p.category}</span>
+                <span class="text-[9px] font-bold uppercase tracking-wider text-gray-400">Frutas</span>
                 <h3 class="font-bold text-gray-800 text-xs sm:text-sm leading-tight mt-0.5">${p.name}</h3>
                 <div class="flex items-baseline gap-1 mt-1.5">
                   <span class="text-brand-green font-extrabold text-sm sm:text-base">R$ ${p.price.toFixed(2).replace('.', ',')}</span>
@@ -318,7 +313,7 @@
       const modalImg = document.getElementById('modal-img');
       modalImg.src = p.image;
       modalImg.onerror = function() { this.src = fallbackImage; };
-      document.getElementById('modal-cat').innerText = p.category;
+      document.getElementById('modal-cat').innerText = "Frutas";
       document.getElementById('modal-title').innerText = p.name;
       document.getElementById('modal-desc').innerText = p.desc;
       document.getElementById('modal-price').innerText = `R$ ${p.price.toFixed(2).replace('.', ',')}`;
@@ -453,7 +448,6 @@
         const cat = e.target.getAttribute('data-cat');
         if (cat === 'todos') currentProducts = [...products];
         else if (cat === 'promocao') currentProducts = products.filter(p => p.isPromo);
-        else currentProducts = products.filter(p => p.category === cat);
         sortProducts();
       });
     });
