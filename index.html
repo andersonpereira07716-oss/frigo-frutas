@@ -22,6 +22,7 @@
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex flex-col pb-24">
 
+  <!-- Header -->
   <header class="bg-brand-green text-white p-4 shadow-md sticky top-0 z-30 flex justify-between items-center">
     <div class="flex items-center space-x-2">
       <i class="fa-solid fa-lemon text-brand-accent text-2xl"></i>
@@ -33,6 +34,13 @@
     </button>
   </header>
 
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed top-16 right-4 bg-gray-900 text-white px-4 py-2 rounded-xl shadow-xl text-xs font-bold z-50 transition transform translate-y-[-100px] opacity-0 flex items-center gap-2">
+    <i class="fa-solid fa-circle-check text-green-400 text-base"></i>
+    <span id="toast-msg">Item adicionado ao carrinho!</span>
+  </div>
+
+  <!-- Banner Instalação PWA -->
   <div id="pwa-banner" class="bg-yellow-100 border-b border-yellow-300 p-3 text-xs md:text-sm text-yellow-900 flex justify-between items-center hidden">
     <div class="flex items-center space-x-2">
       <i class="fa-solid fa-mobile-screen text-yellow-700 text-base"></i>
@@ -44,48 +52,80 @@
   </div>
 
   <main class="max-w-4xl mx-auto px-4 py-6 w-full flex-grow">
+    <!-- Busca e Filtros -->
     <section class="mb-6 space-y-3">
       <div class="relative">
         <input type="text" id="search-input" placeholder="Buscar fruta, polpa, legume..." 
                class="w-full p-3 pl-10 rounded-xl border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-green text-sm">
         <i class="fa-solid fa-search absolute left-3 top-3.5 text-gray-400"></i>
       </div>
-      <div class="flex space-x-2 overflow-x-auto pb-2">
+      <div class="flex space-x-2 overflow-x-auto pb-2 scrollbar-none">
         <button class="category-btn bg-brand-green text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap shadow" data-cat="todos">Todos</button>
+        <button class="category-btn bg-white text-gray-700 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap border border-gray-200" data-cat="promocao">🔥 Ofertas</button>
         <button class="category-btn bg-white text-gray-700 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap border border-gray-200" data-cat="frutas">Frutas</button>
         <button class="category-btn bg-white text-gray-700 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap border border-gray-200" data-cat="polpas">Polpas</button>
         <button class="category-btn bg-white text-gray-700 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap border border-gray-200" data-cat="legumes">Legumes</button>
       </div>
     </section>
 
+    <!-- Lista de Produtos -->
     <section id="products-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
     </section>
   </main>
 
+  <!-- Modal do Carrinho e Checkout -->
   <div id="cart-modal" class="fixed inset-0 bg-black/50 z-50 flex justify-end hidden">
     <div class="bg-white w-full max-w-md h-full flex flex-col justify-between shadow-2xl">
       <div class="bg-brand-green text-white p-4 flex justify-between items-center">
         <h2 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-cart-shopping"></i> Seu Pedido</h2>
         <button id="close-cart-btn" class="text-white text-xl font-bold hover:text-gray-200">&times;</button>
       </div>
+
       <div id="cart-items" class="p-4 flex-grow overflow-y-auto divide-y divide-gray-100"></div>
-      <div class="p-4 bg-gray-50 border-t border-gray-200 space-y-3">
+
+      <!-- Form Checkout -->
+      <div class="p-4 bg-gray-50 border-t border-gray-200 space-y-3 overflow-y-auto max-h-[60vh]">
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Seu Nome:</label>
           <input type="text" id="cust-name" placeholder="Ex: João Silva" class="w-full p-2 border rounded-lg text-sm bg-white">
         </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Endereço de Entrega (Patos-PB):</label>
-          <input type="text" id="cust-address" placeholder="Rua, número e bairro" class="w-full p-2 border rounded-lg text-sm bg-white">
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Bairro (Patos-PB):</label>
+            <select id="cust-neighborhood" onchange="updateCartUI()" class="w-full p-2 border rounded-lg text-sm bg-white font-medium">
+              <option value="Centro" data-fee="3.00">Centro (R$ 3,00)</option>
+              <option value="Brasília" data-fee="4.00">Brasília (R$ 4,00)</option>
+              <option value="Belo Horizonte" data-fee="4.00">Belo Horizonte (R$ 4,00)</option>
+              <option value="Jatobá" data-fee="5.00">Jatobá (R$ 5,00)</option>
+              <option value="Maternidade" data-fee="4.00">Maternidade (R$ 4,00)</option>
+              <option value="Outro" data-fee="6.00">Outro Bairro (R$ 6,00)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Entrega:</label>
+            <select id="delivery-time" class="w-full p-2 border rounded-lg text-sm bg-white">
+              <option value="O mais rápido possível">Imediata</option>
+              <option value="Manhã (08h às 12h)">Turno Manhã</option>
+              <option value="Tarde (14h às 18h)">Turno Tarde</option>
+            </select>
+          </div>
         </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Rua, Número e Ponto de Referência:</label>
+          <input type="text" id="cust-address" placeholder="Rua Santo Antônio, nº 123" class="w-full p-2 border rounded-lg text-sm bg-white">
+        </div>
+
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Forma de Pagamento:</label>
           <select id="payment-method" class="w-full p-2 border rounded-lg text-sm bg-white">
             <option value="Pix">Pix (Chave Instantânea)</option>
-            <option value="Cartão de Crédito/Débito">Cartão de Crédito/Débito na Entrega</option>
-            <option value="Dinheiro">Dinheiro (Em espécie)</option>
+            <option value="Cartão de Crédito/Débito">Cartão na Entrega</option>
+            <option value="Dinheiro">Dinheiro</option>
           </select>
         </div>
+
         <div id="pix-box" class="bg-green-50 p-3 rounded-lg border border-green-200 text-xs text-green-900 space-y-1">
           <p class="font-bold"><i class="fa-solid fa-qrcode mr-1"></i> Chave Pix (Celular):</p>
           <div class="flex items-center justify-between bg-white p-2 rounded border border-green-300">
@@ -93,12 +133,25 @@
             <button onclick="copyPixKey()" class="text-brand-green font-bold text-xs hover:underline">Copiar</button>
           </div>
         </div>
-        <div class="border-t pt-2 flex justify-between items-center text-base font-bold text-gray-800">
-          <span>Total:</span>
-          <span id="cart-total" class="text-brand-green text-xl">R$ 0,00</span>
+
+        <!-- Resumo financeiro -->
+        <div class="border-t pt-2 space-y-1 text-sm">
+          <div class="flex justify-between text-gray-500">
+            <span>Subtotal:</span>
+            <span id="cart-subtotal">R$ 0,00</span>
+          </div>
+          <div class="flex justify-between text-gray-500">
+            <span>Taxa de Entrega:</span>
+            <span id="cart-fee">R$ 0,00</span>
+          </div>
+          <div class="flex justify-between items-center text-base font-bold text-gray-800 border-t pt-1">
+            <span>Total Final:</span>
+            <span id="cart-total" class="text-brand-green text-xl">R$ 0,00</span>
+          </div>
         </div>
+
         <button onclick="submitOrder()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
-          <i class="fa-brands fa-whatsapp text-lg"></i> Enviar Pedido no WhatsApp
+          <i class="fa-brands fa-whatsapp text-lg"></i> Confirmar Pedido no WhatsApp
         </button>
       </div>
     </div>
@@ -106,24 +159,30 @@
 
   <script>
     const products = [
-      { id: 1, name: "Maçã Fuji (kg)", price: 8.50, category: "frutas", icon: "fa-apple-whole", color: "text-red-500" },
-      { id: 2, name: "Banana Prata (kg)", price: 6.00, category: "frutas", icon: "fa-disease", color: "text-yellow-500" },
-      { id: 3, name: "Polpa Acerola (400g)", price: 5.00, category: "polpas", icon: "fa-wine-bottle", color: "text-red-600" },
-      { id: 4, name: "Polpa Maracujá (400g)", price: 6.50, category: "polpas", icon: "fa-wine-bottle", color: "text-yellow-600" },
-      { id: 5, name: "Polpa Goiaba (400g)", price: 5.00, category: "polpas", icon: "fa-wine-bottle", color: "text-pink-500" },
-      { id: 6, name: "Cenoura (kg)", price: 4.50, category: "legumes", icon: "fa-carrot", color: "text-orange-500" },
+      { id: 1, name: "Maçã Fuji (kg)", price: 8.50, oldPrice: 10.00, category: "frutas", isPromo: true, icon: "fa-apple-whole", color: "text-red-500" },
+      { id: 2, name: "Banana Prata (kg)", price: 6.00, oldPrice: null, category: "frutas", isPromo: false, icon: "fa-disease", color: "text-yellow-500" },
+      { id: 3, name: "Polpa Acerola (400g)", price: 4.50, oldPrice: 6.00, category: "polpas", isPromo: true, icon: "fa-wine-bottle", color: "text-red-600" },
+      { id: 4, name: "Polpa Maracujá (400g)", price: 6.50, oldPrice: null, category: "polpas", isPromo: false, icon: "fa-wine-bottle", color: "text-yellow-600" },
+      { id: 5, name: "Polpa Goiaba (400g)", price: 5.00, oldPrice: null, category: "polpas", isPromo: false, icon: "fa-wine-bottle", color: "text-pink-500" },
+      { id: 6, name: "Cenoura (kg)", price: 4.50, oldPrice: null, category: "legumes", isPromo: false, icon: "fa-carrot", color: "text-orange-500" },
     ];
+
     let cart = [], deferredPrompt;
+
     function renderProducts(items) {
       const grid = document.getElementById('products-grid');
       grid.innerHTML = items.length === 0 ? `<p class="col-span-full text-center text-gray-500 py-8 text-sm">Nenhum produto encontrado.</p>` :
         items.map(p => `
-          <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col justify-between hover:shadow-md transition">
+          <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col justify-between hover:shadow-md transition relative">
+            ${p.isPromo ? `<span class="absolute top-2 right-2 bg-red-500 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-full uppercase tracking-wider">Oferta</span>` : ''}
             <div class="text-center py-4 bg-gray-50 rounded-lg mb-2"><i class="fa-solid ${p.icon} ${p.color} text-4xl"></i></div>
             <div>
               <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">${p.category}</span>
               <h3 class="font-bold text-gray-800 text-sm leading-tight">${p.name}</h3>
-              <p class="text-brand-green font-extrabold text-base mt-1">R$ ${p.price.toFixed(2).replace('.', ',')}</p>
+              <div class="flex items-baseline gap-1 mt-1">
+                <span class="text-brand-green font-extrabold text-base">R$ ${p.price.toFixed(2).replace('.', ',')}</span>
+                ${p.oldPrice ? `<span class="text-gray-400 text-xs line-through">R$ ${p.oldPrice.toFixed(2).replace('.', ',')}</span>` : ''}
+              </div>
             </div>
             <button onclick="addToCart(${p.id})" class="mt-3 w-full bg-brand-green hover:bg-brand-darkgreen text-white text-xs font-bold py-2 rounded-lg transition flex items-center justify-center gap-1">
               <i class="fa-solid fa-plus"></i> Adicionar
@@ -131,16 +190,42 @@
           </div>
         `).join('');
     }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').innerText = msg;
+      toast.classList.remove('translate-y-[-100px]', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-[-100px]', 'opacity-0');
+      }, 2000);
+    }
+
     function addToCart(id) {
       const prod = products.find(p => p.id === id), item = cart.find(c => c.id === id);
       if (item) item.qty++; else cart.push({ ...prod, qty: 1 });
       updateCartUI();
+      showToast(`${prod.name} adicionado!`);
     }
+
     function updateCartUI() {
-      const cartItems = document.getElementById('cart-items'), cartCount = document.getElementById('cart-count'), cartTotal = document.getElementById('cart-total');
-      const totalItems = cart.reduce((acc, item) => acc + item.qty, 0), totalPrice = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+      const cartItems = document.getElementById('cart-items'), cartCount = document.getElementById('cart-count');
+      const subtotalEl = document.getElementById('cart-subtotal'), feeEl = document.getElementById('cart-fee'), totalEl = document.getElementById('cart-total');
+
+      const selectNeighborhood = document.getElementById('cust-neighborhood');
+      const fee = parseFloat(selectNeighborhood.options[selectNeighborhood.selectedIndex].getAttribute('data-fee') || 0);
+
+      const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
+      const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+      const total = subtotal > 0 ? subtotal + fee : 0;
+
       if (totalItems > 0) { cartCount.innerText = totalItems; cartCount.classList.remove('hidden'); } else { cartCount.classList.add('hidden'); }
-      cartTotal.innerText = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
+
+      subtotalEl.innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+      feeEl.innerText = `R$ ${fee.toFixed(2).replace('.', ',')}`;
+      totalEl.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+
       cartItems.innerHTML = cart.length === 0 ? `<p class="text-center text-gray-400 py-10 text-sm">Seu carrinho está vazio.</p>` :
         cart.map(item => `
           <div class="py-3 flex justify-between items-center">
@@ -153,6 +238,7 @@
           </div>
         `).join('');
     }
+
     function changeQty(id, delta) {
       const item = cart.find(c => c.id === id);
       if (!item) return;
@@ -160,36 +246,81 @@
       if (item.qty <= 0) cart = cart.filter(c => c.id !== id);
       updateCartUI();
     }
+
     document.getElementById('search-input').addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase();
       renderProducts(products.filter(p => p.name.toLowerCase().includes(term)));
     });
+
     document.querySelectorAll('.category-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         document.querySelectorAll('.category-btn').forEach(b => b.className = "category-btn bg-white text-gray-700 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap border border-gray-200");
         e.target.className = "category-btn bg-brand-green text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap shadow";
         const cat = e.target.getAttribute('data-cat');
-        renderProducts(cat === 'todos' ? products : products.filter(p => p.category === cat));
+        if (cat === 'todos') renderProducts(products);
+        else if (cat === 'promocao') renderProducts(products.filter(p => p.isPromo));
+        else renderProducts(products.filter(p => p.category === cat));
       });
     });
+
     function copyPixKey() {
       navigator.clipboard.writeText(document.getElementById('pix-key').innerText);
-      alert('Chave Pix copiada com sucesso!');
+      showToast('Chave Pix copiada!');
     }
+
+    function saveUserData(name, address, neighborhood) {
+      localStorage.setItem('frigo_cust_name', name);
+      localStorage.setItem('frigo_cust_address', address);
+      localStorage.setItem('frigo_cust_neighborhood', neighborhood);
+    }
+
+    function loadUserData() {
+      if (localStorage.getItem('frigo_cust_name')) document.getElementById('cust-name').value = localStorage.getItem('frigo_cust_name');
+      if (localStorage.getItem('frigo_cust_address')) document.getElementById('cust-address').value = localStorage.getItem('frigo_cust_address');
+      if (localStorage.getItem('frigo_cust_neighborhood')) document.getElementById('cust-neighborhood').value = localStorage.getItem('frigo_cust_neighborhood');
+    }
+
     function submitOrder() {
       if (cart.length === 0) { alert('Adicione pelo menos um produto!'); return; }
-      const name = document.getElementById('cust-name').value.trim(), address = document.getElementById('cust-address').value.trim(), payment = document.getElementById('payment-method').value;
+      const name = document.getElementById('cust-name').value.trim();
+      const address = document.getElementById('cust-address').value.trim();
+      const neighborhood = document.getElementById('cust-neighborhood').value;
+      const deliveryTime = document.getElementById('delivery-time').value;
+      const payment = document.getElementById('payment-method').value;
+
+      const selectNeighborhood = document.getElementById('cust-neighborhood');
+      const fee = parseFloat(selectNeighborhood.options[selectNeighborhood.selectedIndex].getAttribute('data-fee') || 0);
+
       if (!name || !address) { alert('Preencha seu nome e endereço.'); return; }
-      let text = `🛒 *NOVO PEDIDO - FRIGO FRUTAS*\n\n👤 *Cliente:* ${name}\n📍 *Endereço:* ${address}\n💳 *Pagamento:* ${payment}\n\n📦 *Itens:*\n`;
+
+      saveUserData(name, address, neighborhood);
+
+      const subtotal = cart.reduce((a, b) => a + (b.price * b.qty), 0);
+      const total = subtotal + fee;
+
+      let text = `🛒 *NOVO PEDIDO - FRIGO FRUTAS*\n\n`;
+      text += `👤 *Cliente:* ${name}\n`;
+      text += `📍 *Endereço:* ${address} (${neighborhood} - Patos/PB)\n`;
+      text += `⏰ *Horário:* ${deliveryTime}\n`;
+      text += `💳 *Pagamento:* ${payment}\n\n`;
+      text += `📦 *Itens do Pedido:*\n`;
       cart.forEach(i => text += `- ${i.qty}x ${i.name} (R$ ${(i.price * i.qty).toFixed(2).replace('.', ',')})\n`);
-      text += `\n💰 *Total:* R$ ${cart.reduce((a, b) => a + (b.price * b.qty), 0).toFixed(2).replace('.', ',')}`;
+      text += `\n💵 *Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
+      text += `🛵 *Entrega:* R$ ${fee.toFixed(2).replace('.', ',')}\n`;
+      text += `💰 *TOTAL:* R$ ${total.toFixed(2).replace('.', ',')}`;
+
       window.open(`https://wa.me/5583998765554?text=${encodeURIComponent(text)}`, '_blank');
     }
+
     document.getElementById('open-cart-btn').addEventListener('click', () => document.getElementById('cart-modal').classList.remove('hidden'));
     document.getElementById('close-cart-btn').addEventListener('click', () => document.getElementById('cart-modal').classList.add('hidden'));
+
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('pwa-banner').classList.remove('hidden'); });
     document.getElementById('install-pwa-btn').addEventListener('click', () => { if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; document.getElementById('pwa-banner').classList.add('hidden'); }); } });
+
+    loadUserData();
     renderProducts(products);
+    updateCartUI();
   </script>
 </body>
 </html>
