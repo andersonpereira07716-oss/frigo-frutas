@@ -23,7 +23,7 @@
 <body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex flex-col justify-between pb-20">
 
   <div>
-    <!-- Header Profissional -->
+    <!-- Header Profissional com Botão de Partilha -->
     <header class="bg-brand-green text-white p-4 shadow-md sticky top-0 z-30 flex justify-between items-center">
       <div class="flex items-center space-x-2">
         <div class="bg-white text-brand-green p-1.5 rounded-full shadow">
@@ -36,10 +36,15 @@
           </p>
         </div>
       </div>
-      <button id="open-cart-btn" class="relative bg-brand-darkgreen p-2.5 rounded-full hover:bg-green-800 transition shadow">
-        <i class="fa-solid fa-shopping-cart text-lg"></i>
-        <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
-      </button>
+      <div class="flex items-center space-x-2">
+        <button onclick="shareApp()" class="bg-green-700 p-2 rounded-full hover:bg-green-800 transition text-white text-xs" title="Partilhar App">
+          <i class="fa-solid fa-share-nodes text-sm"></i>
+        </button>
+        <button id="open-cart-btn" class="relative bg-brand-darkgreen p-2 rounded-full hover:bg-green-800 transition shadow">
+          <i class="fa-solid fa-shopping-cart text-base"></i>
+          <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+        </button>
+      </div>
     </header>
 
     <!-- Toast Notification -->
@@ -48,8 +53,8 @@
       <span id="toast-msg">Item adicionado!</span>
     </div>
 
-    <!-- Banner Instalação PWA -->
-    <div id="pwa-banner" class="bg-yellow-100 border-b border-yellow-300 p-3 text-xs md:text-sm text-yellow-900 flex justify-between items-center hidden">
+    <!-- Banner PWA -->
+    <div id="pwa-banner" class="bg-yellow-100 border-b border-yellow-300 p-3 text-xs text-yellow-900 flex justify-between items-center hidden">
       <div class="flex items-center space-x-2">
         <i class="fa-solid fa-mobile-screen text-yellow-700 text-base"></i>
         <span>Instale o aplicativo na sua tela inicial!</span>
@@ -60,13 +65,12 @@
     </div>
 
     <main class="max-w-4xl mx-auto px-4 py-6 w-full">
-      
-      <!-- Banner de Destaque / Promoção -->
+      <!-- Banner Destaque -->
       <section class="mb-6 bg-gradient-to-r from-green-700 to-emerald-600 rounded-2xl p-4 text-white shadow-md flex justify-between items-center">
         <div>
           <span class="bg-yellow-400 text-green-900 font-extrabold text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider">Frete Rápido</span>
           <h2 class="text-base font-bold mt-1">Frutas Frescas Direto para sua Mesa</h2>
-          <p class="text-xs text-green-100 mt-0.5">Peça pelo app e receba com total comodidade em Patos-PB.</p>
+          <p class="text-xs text-green-100 mt-0.5">Use o cupom <span class="font-bold underline">FRIGO10</span> para 10% OFF!</p>
         </div>
         <div class="text-3xl text-yellow-300 pl-2">
           <i class="fa-solid fa-basket-shopping"></i>
@@ -89,13 +93,13 @@
         </div>
       </section>
 
-      <!-- Lista de Produtos com Fotos Reais -->
+      <!-- Grid de Produtos -->
       <section id="products-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
       </section>
     </main>
   </div>
 
-  <!-- Rodapé Comercial Profissional -->
+  <!-- Rodapé Comercial -->
   <footer class="bg-gray-900 text-gray-400 py-8 px-4 text-xs mt-12 border-t border-gray-800">
     <div class="max-w-4xl mx-auto space-y-4 text-center sm:text-left sm:flex sm:justify-between sm:items-center sm:space-y-0">
       <div>
@@ -115,7 +119,7 @@
     </div>
   </footer>
 
-  <!-- Modal do Carrinho e Checkout -->
+  <!-- Modal do Carrinho -->
   <div id="cart-modal" class="fixed inset-0 bg-black/50 z-50 flex justify-end hidden">
     <div class="bg-white w-full max-w-md h-full flex flex-col justify-between shadow-2xl">
       <div class="bg-brand-green text-white p-4 flex justify-between items-center">
@@ -126,6 +130,12 @@
       <div id="cart-items" class="p-4 flex-grow overflow-y-auto divide-y divide-gray-100"></div>
 
       <div class="p-4 bg-gray-50 border-t border-gray-200 space-y-3 overflow-y-auto max-h-[60vh]">
+        <!-- Cupom de Desconto -->
+        <div class="flex gap-2">
+          <input type="text" id="coupon-code" placeholder="Cupom (ex: FRIGO10)" class="uppercase p-2 border rounded-lg text-xs bg-white flex-grow">
+          <button onclick="applyCoupon()" class="bg-gray-800 text-white font-bold px-3 text-xs rounded-lg hover:bg-black transition">Aplicar</button>
+        </div>
+
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Seu Nome:</label>
           <input type="text" id="cust-name" placeholder="Ex: João Silva" class="w-full p-2 border rounded-lg text-sm bg-white">
@@ -146,25 +156,30 @@
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1">Entrega:</label>
             <select id="delivery-time" class="w-full p-2 border rounded-lg text-sm bg-white">
-              <option value="O mais rápido possível">Imediata</option>
-              <option value="Manhã (08h às 12h)">Turno Manhã</option>
-              <option value="Tarde (14h às 18h)">Turno Tarde</option>
+              <option value="Imediata">Imediata</option>
+              <option value="Turno Manhã">Turno Manhã</option>
+              <option value="Turno Tarde">Turno Tarde</option>
             </select>
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Rua, Número e Ponto de Referência:</label>
-          <input type="text" id="cust-address" placeholder="Rua Santo Antônio, nº 123" class="w-full p-2 border rounded-lg text-sm bg-white">
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Endereço Completo:</label>
+          <input type="text" id="cust-address" placeholder="Rua, número e referência" class="w-full p-2 border rounded-lg text-sm bg-white">
         </div>
 
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Forma de Pagamento:</label>
-          <select id="payment-method" class="w-full p-2 border rounded-lg text-sm bg-white">
+          <select id="payment-method" onchange="togglePayFields()" class="w-full p-2 border rounded-lg text-sm bg-white">
             <option value="Pix">Pix (Chave Instantânea)</option>
-            <option value="Cartão de Crédito/Débito">Cartão na Entrega</option>
             <option value="Dinheiro">Dinheiro</option>
+            <option value="Cartão">Cartão na Entrega</option>
           </select>
+        </div>
+
+        <div id="change-box" class="hidden">
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Troco para quanto?</label>
+          <input type="number" id="cash-change" placeholder="Ex: 50" class="w-full p-2 border rounded-lg text-sm bg-white">
         </div>
 
         <div id="pix-box" class="bg-green-50 p-3 rounded-lg border border-green-200 text-xs text-green-900 space-y-1">
@@ -176,17 +191,11 @@
         </div>
 
         <div class="border-t pt-2 space-y-1 text-sm">
-          <div class="flex justify-between text-gray-500">
-            <span>Subtotal:</span>
-            <span id="cart-subtotal">R$ 0,00</span>
-          </div>
-          <div class="flex justify-between text-gray-500">
-            <span>Taxa de Entrega:</span>
-            <span id="cart-fee">R$ 0,00</span>
-          </div>
+          <div class="flex justify-between text-gray-500"><span>Subtotal:</span><span id="cart-subtotal">R$ 0,00</span></div>
+          <div class="flex justify-between text-gray-500"><span>Desconto:</span><span id="cart-discount" class="text-red-500">- R$ 0,00</span></div>
+          <div class="flex justify-between text-gray-500"><span>Taxa de Entrega:</span><span id="cart-fee">R$ 0,00</span></div>
           <div class="flex justify-between items-center text-base font-bold text-gray-800 border-t pt-1">
-            <span>Total Final:</span>
-            <span id="cart-total" class="text-brand-green text-xl">R$ 0,00</span>
+            <span>Total Final:</span><span id="cart-total" class="text-brand-green text-xl">R$ 0,00</span>
           </div>
         </div>
 
@@ -202,12 +211,12 @@
       { id: 1, name: "Maçã Fuji (kg)", price: 8.50, oldPrice: 10.00, category: "frutas", isPromo: true, image: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=300&q=80" },
       { id: 2, name: "Banana Prata (kg)", price: 6.00, oldPrice: null, category: "frutas", isPromo: false, image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=300&q=80" },
       { id: 3, name: "Polpa Acerola (400g)", price: 4.50, oldPrice: 6.00, category: "polpas", isPromo: true, image: "https://images.unsplash.com/photo-1610970881699-44a5587cabec?auto=format&fit=crop&w=300&q=80" },
-      { id: 4, name: "Polpa Maracujá (400g)", price: 6.50, oldPrice: null, category: "polpas", isPromo: false, image: "https://images.unsplash.com/photo-1598514982205-13fe3e9cff56?auto=format&fit=crop&w=300&q=80" },
+      { id: 4, name: "Polpa Maracujá (400g)", price: 6.50, oldPrice: null, category: "polpas", isPromo: false, image: "https://images.unsplash.com/photo-1528821128474-27f963b072b7?auto=format&fit=crop&w=300&q=80" },
       { id: 5, name: "Polpa Goiaba (400g)", price: 5.00, oldPrice: null, category: "polpas", isPromo: false, image: "https://images.unsplash.com/photo-1536590158209-e9d615d52584?auto=format&fit=crop&w=300&q=80" },
       { id: 6, name: "Cenoura Fresca (kg)", price: 4.50, oldPrice: null, category: "legumes", isPromo: false, image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=300&q=80" }
     ];
 
-    let cart = [], deferredPrompt;
+    let cart = [], discountPercent = 0, deferredPrompt;
 
     function renderProducts(items) {
       const grid = document.getElementById('products-grid');
@@ -253,20 +262,40 @@
       showToast(`${prod.name} adicionado!`);
     }
 
+    function applyCoupon() {
+      const code = document.getElementById('coupon-code').value.trim().toUpperCase();
+      if (code === 'FRIGO10') {
+        discountPercent = 0.10;
+        showToast('Cupom de 10% aplicado!');
+      } else {
+        discountPercent = 0;
+        alert('Cupom inválido.');
+      }
+      updateCartUI();
+    }
+
+    function togglePayFields() {
+      const method = document.getElementById('payment-method').value;
+      document.getElementById('pix-box').style.display = method === 'Pix' ? 'block' : 'none';
+      document.getElementById('change-box').style.display = method === 'Dinheiro' ? 'block' : 'none';
+    }
+
     function updateCartUI() {
       const cartItems = document.getElementById('cart-items'), cartCount = document.getElementById('cart-count');
-      const subtotalEl = document.getElementById('cart-subtotal'), feeEl = document.getElementById('cart-fee'), totalEl = document.getElementById('cart-total');
+      const subtotalEl = document.getElementById('cart-subtotal'), feeEl = document.getElementById('cart-fee'), totalEl = document.getElementById('cart-total'), discountEl = document.getElementById('cart-discount');
 
       const selectNeighborhood = document.getElementById('cust-neighborhood');
       const fee = parseFloat(selectNeighborhood.options[selectNeighborhood.selectedIndex].getAttribute('data-fee') || 0);
 
       const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
       const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-      const total = subtotal > 0 ? subtotal + fee : 0;
+      const discountVal = subtotal * discountPercent;
+      const total = subtotal > 0 ? (subtotal - discountVal) + fee : 0;
 
       if (totalItems > 0) { cartCount.innerText = totalItems; cartCount.classList.remove('hidden'); } else { cartCount.classList.add('hidden'); }
 
       subtotalEl.innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+      discountEl.innerText = `- R$ ${discountVal.toFixed(2).replace('.', ',')}`;
       feeEl.innerText = `R$ ${fee.toFixed(2).replace('.', ',')}`;
       totalEl.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
 
@@ -291,6 +320,15 @@
       updateCartUI();
     }
 
+    function shareApp() {
+      if (navigator.share) {
+        navigator.share({ title: 'Frigo Frutas App', url: window.location.href });
+      } else {
+        navigator.clipboard.writeText(window.location.href);
+        showToast('Link do App copiado!');
+      }
+    }
+
     document.getElementById('search-input').addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase();
       renderProducts(products.filter(p => p.name.toLowerCase().includes(term)));
@@ -312,18 +350,6 @@
       showToast('Chave Pix copiada!');
     }
 
-    function saveUserData(name, address, neighborhood) {
-      localStorage.setItem('frigo_cust_name', name);
-      localStorage.setItem('frigo_cust_address', address);
-      localStorage.setItem('frigo_cust_neighborhood', neighborhood);
-    }
-
-    function loadUserData() {
-      if (localStorage.getItem('frigo_cust_name')) document.getElementById('cust-name').value = localStorage.getItem('frigo_cust_name');
-      if (localStorage.getItem('frigo_cust_address')) document.getElementById('cust-address').value = localStorage.getItem('frigo_cust_address');
-      if (localStorage.getItem('frigo_cust_neighborhood')) document.getElementById('cust-neighborhood').value = localStorage.getItem('frigo_cust_neighborhood');
-    }
-
     function submitOrder() {
       if (cart.length === 0) { alert('Adicione pelo menos um produto!'); return; }
       const name = document.getElementById('cust-name').value.trim();
@@ -331,25 +357,26 @@
       const neighborhood = document.getElementById('cust-neighborhood').value;
       const deliveryTime = document.getElementById('delivery-time').value;
       const payment = document.getElementById('payment-method').value;
+      const cashChange = document.getElementById('cash-change').value;
 
       const selectNeighborhood = document.getElementById('cust-neighborhood');
       const fee = parseFloat(selectNeighborhood.options[selectNeighborhood.selectedIndex].getAttribute('data-fee') || 0);
 
       if (!name || !address) { alert('Preencha seu nome e endereço.'); return; }
 
-      saveUserData(name, address, neighborhood);
-
       const subtotal = cart.reduce((a, b) => a + (b.price * b.qty), 0);
-      const total = subtotal + fee;
+      const discountVal = subtotal * discountPercent;
+      const total = (subtotal - discountVal) + fee;
 
       let text = `🛒 *NOVO PEDIDO - FRIGO FRUTAS*\n\n`;
       text += `👤 *Cliente:* ${name}\n`;
       text += `📍 *Endereço:* ${address} (${neighborhood} - Patos/PB)\n`;
       text += `⏰ *Horário:* ${deliveryTime}\n`;
-      text += `💳 *Pagamento:* ${payment}\n\n`;
-      text += `📦 *Itens do Pedido:*\n`;
+      text += `💳 *Pagamento:* ${payment}\n`;
+      if (payment === 'Dinheiro' && cashChange) text += `💵 *Troco para:* R$ ${cashChange}\n`;
+      text += `\n📦 *Itens do Pedido:*\n`;
       cart.forEach(i => text += `- ${i.qty}x ${i.name} (R$ ${(i.price * i.qty).toFixed(2).replace('.', ',')})\n`);
-      text += `\n💵 *Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
+      if (discountVal > 0) text += `\n🎟️ *Desconto:* - R$ ${discountVal.toFixed(2).replace('.', ',')}\n`;
       text += `🛵 *Entrega:* R$ ${fee.toFixed(2).replace('.', ',')}\n`;
       text += `💰 *TOTAL:* R$ ${total.toFixed(2).replace('.', ',')}`;
 
@@ -362,7 +389,6 @@
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('pwa-banner').classList.remove('hidden'); });
     document.getElementById('install-pwa-btn').addEventListener('click', () => { if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; document.getElementById('pwa-banner').classList.add('hidden'); }); } });
 
-    loadUserData();
     renderProducts(products);
     updateCartUI();
   </script>
