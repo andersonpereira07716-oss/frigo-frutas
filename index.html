@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0f5a1e"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><title>Frigo Frutas · App de pedidos</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--g:#1c7a2d;--g2:#0f5a1e;--r:#d9302b;--y:#f4c430;--bg:#f6f9f1;--card:#fff;--tx:#1b2a1d;--mu:#5d6b5f;--bd:#dfe8d8;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--g:#4cc15f;--g2:#2f9a41;--bg:#0f1a11;--card:#182519;--tx:#eaf3e6;--mu:#9db39f;--bd:#2a3b2c;color-scheme:dark}}
+:root[data-theme="dark"]{--g:#4cc15f;--g2:#2f9a41;--bg:#0f1a11;--card:#182519;--tx:#eaf3e6;--mu:#9db39f;--bd:#2a3b2c;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 Nunito,system-ui,sans-serif}
+h1,h2,.brand{font-family:"Baloo 2",system-ui,sans-serif;line-height:1.05;margin:0}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;max-width:1100px;margin:auto}
+.brand{font-size:22px;font-weight:800;color:var(--g)}.brand b{color:var(--r)}
+header nav a{color:var(--mu);text-decoration:none;margin-left:18px;font-weight:700}
+.stage{max-width:1100px;margin:auto;padding:10px 20px 50px;display:grid;grid-template-columns:1fr 360px;gap:40px;align-items:center}
+.intro h1{font-size:clamp(38px,6vw,64px);font-weight:800;color:var(--g)}
+.intro h1 span{color:var(--r)}
+.intro p{max-width:46ch;color:var(--mu);font-size:18px}
+.feats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:26px 0;max-width:520px}
+.feats div{border-left:4px solid var(--y);padding:2px 10px;font-weight:700}
+.feats small{display:block;color:var(--mu);font-weight:400}
+.cta{background:var(--r);color:#fff;border:0;border-radius:999px;padding:13px 26px;font:800 17px "Baloo 2",sans-serif;cursor:pointer}
+.cta:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--y);outline-offset:2px}
+.phone{width:100%;max-width:480px;height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));margin:auto;background:var(--card);display:flex;flex-direction:column;position:relative}
+.top{background:var(--g2);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;font-family:"Baloo 2",sans-serif;font-weight:800;font-size:18px}
+.top button{background:none;border:0;color:#fff;font-size:20px;cursor:pointer}
+.body{flex:1;overflow:auto;padding:14px}
+.chips{display:flex;gap:8px;overflow-x:auto;margin-bottom:12px}
+.chip{flex:none;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer}
+.chip.on{background:var(--g);color:#fff;border-color:var(--g)}
+.promo{background:var(--g);color:#fff;border-radius:14px;padding:14px;margin-bottom:12px}
+.promo b{font:800 20px "Baloo 2";display:block}
+.row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.em{font-size:34px;width:46px;text-align:center}
+.row .i{flex:1}.row .i small{color:var(--mu);display:block}
+.add{width:34px;height:34px;border-radius:50%;border:0;background:var(--g);color:#fff;font-size:20px;cursor:pointer}
+.qty{display:flex;align-items:center;gap:8px}.qty button{width:28px;height:28px;border-radius:50%;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer}
+.bar{border-top:1px solid var(--bd);padding:12px 14px;background:var(--card)}
+.bar .cta{width:100%;background:var(--g)}
+.bar .cta[disabled]{opacity:.45;cursor:not-allowed}
+.sum{display:flex;justify-content:space-between;color:var(--mu)}.sum.t{color:var(--tx);font-weight:800;font-size:18px;margin:4px 0 10px}
+label.opt{display:flex;gap:10px;align-items:center;border:1.5px solid var(--bd);border-radius:12px;padding:11px;margin:8px 0;cursor:pointer;font-weight:700}
+label.opt:has(input:checked){border-color:var(--g);background:rgba(76,193,95,.12)}
+input[type=text]{width:100%;padding:11px;border:1.5px solid var(--bd);border-radius:12px;background:var(--card);color:var(--tx);font:inherit}
+.pix{background:var(--bg);border:1px dashed var(--g);border-radius:12px;padding:10px;font-size:12px;word-break:break-all;margin-top:8px}
+.steps{list-style:none;padding:0;margin:14px 0}
+.steps li{padding:9px 0 9px 30px;position:relative;color:var(--mu)}
+.steps li:before{content:"";position:absolute;left:4px;top:13px;width:14px;height:14px;border-radius:50%;border:2px solid var(--bd)}
+.steps li.d{color:var(--tx);font-weight:700}.steps li.d:before{background:var(--g);border-color:var(--g)}
+.note{font-size:13px;color:var(--mu);margin-top:10px}
+@media(max-width:860px){.stage{grid-template-columns:1fr;justify-items:center}.intro{justify-self:start}header nav{display:none}}
+</style>
+</head>
+<body>
+<div class="phone" id="app"><div class="top"><span id="ttl">Frigo Frutas</span><button id="cartBtn" aria-label="Abrir carrinho">🛒 <span id="cnt">0</span></button></div><div class="body" id="body"></div><div class="bar" id="bar" hidden></div></div>
+<script>
+var P=[{n:"Banana prata",u:"1 kg",p:4.99,e:"🍌",c:"Frutas"},{n:"Maçã Fuji",u:"1 kg",p:8.99,e:"🍎",c:"Frutas"},{n:"Uva Itália",u:"500 g",p:6.99,e:"🍇",c:"Frutas"},{n:"Mamão formosa",u:"1 kg",p:5.49,e:"🥭",c:"Frutas"},{n:"Laranja pera",u:"1 kg",p:4.49,e:"🍊",c:"Frutas"},{n:"Melancia",u:"1 kg",p:3.99,e:"🍉",c:"Frutas"},{n:"Alface crespa",u:"unidade",p:3.5,e:"🥬",c:"Verduras"},{n:"Tomate",u:"1 kg",p:7.9,e:"🍅",c:"Legumes"},{n:"Cenoura",u:"1 kg",p:4.2,e:"🥕",c:"Legumes"},{n:"Suco de laranja",u:"1 L",p:9.9,e:"🧃",c:"Bebidas"}];
+var cats=["Todos","Frutas","Verduras","Legumes","Bebidas"],cat="Todos",cart={},view="home",pay="pix",FEE=5;
+var $=function(i){return document.getElementById(i)};
+function brl(v){return "R$ "+v.toFixed(2).replace(".",",")}
+function count(){return Object.values(cart).reduce(function(a,b){return a+b},0)}
+function sub(){return Object.keys(cart).reduce(function(a,k){return a+P[k].p*cart[k]},0)}
+function set(k,d){cart[k]=(cart[k]||0)+d;if(cart[k]<=0)delete cart[k];render()}
+function go(v){view=v;render()}
+function bar(html){var b=$("bar");b.hidden=!html;b.innerHTML=html||""}
+function render(){
+ $("cnt").textContent=count();var b=$("body");
+ if(view==="home"){
+  $("ttl").textContent="Frigo Frutas";
+  b.innerHTML='<div class="promo"><b>Descontos da semana</b>Frutas e verduras fresquinhas com preço especial.</div><div class="chips">'+cats.map(function(c){return '<button class="chip'+(c===cat?' on':'')+'" data-c="'+c+'">'+c+'</button>'}).join("")+'</div>'+
+  P.map(function(x,i){return (cat==="Todos"||x.c===cat)?'<div class="row"><div class="em">'+x.e+'</div><div class="i"><b>'+x.n+'</b><small>'+x.u+' · '+brl(x.p)+'</small></div><button class="add" data-a="'+i+'" aria-label="Adicionar '+x.n+'">+</button></div>':""}).join("");
+  b.querySelectorAll("[data-c]").forEach(function(el){el.onclick=function(){cat=el.dataset.c;render()}});
+  b.querySelectorAll("[data-a]").forEach(function(el){el.onclick=function(){set(+el.dataset.a,1)}});
+  bar(count()?'<button class="cta" id="toCart">Ver carrinho · '+brl(sub())+'</button>':"");
+  if(count())$("toCart").onclick=function(){go("cart")};
+ }else if(view==="cart"){
+  $("ttl").textContent="Carrinho";
+  if(!count()){b.innerHTML='<p>Seu carrinho está vazio. Adicione frutas para começar.</p><button class="cta" id="back">Ver produtos</button>';$("back").onclick=function(){go("home")};bar("");return}
+  b.innerHTML=Object.keys(cart).map(function(k){var x=P[k];return '<div class="row"><div class="em">'+x.e+'</div><div class="i"><b>'+x.n+'</b><small>'+brl(x.p)+'</small></div><div class="qty"><button data-m="'+k+'" aria-label="Diminuir">−</button><b>'+cart[k]+'</b><button data-p="'+k+'" aria-label="Aumentar">+</button></div></div>'}).join("")+'<p class="note"><a href="#" id="more" style="color:var(--g)">Adicionar mais itens</a></p>';
+  b.querySelectorAll("[data-m]").forEach(function(el){el.onclick=function(){set(el.dataset.m,-1)}});
+  b.querySelectorAll("[data-p]").forEach(function(el){el.onclick=function(){set(el.dataset.p,1)}});
+  $("more").onclick=function(e){e.preventDefault();go("home")};
+  bar('<div class="sum"><span>Subtotal</span><span>'+brl(sub())+'</span></div><div class="sum"><span>Taxa de entrega</span><span>'+brl(FEE)+'</span></div><div class="sum t"><span>Total</span><span>'+brl(sub()+FEE)+'</span></div><button class="cta" id="fin">Finalizar compra</button>');
+  $("fin").onclick=function(){go("pay")};
+ }else if(view==="pay"){
+  $("ttl").textContent="Finalizar compra";
+  b.innerHTML='<b>Endereço de entrega</b><input type="text" id="addr" value="Rua Horácio Nóbrega, 250, Belo Horizonte, Patos–PB" aria-label="Endereço de entrega" style="margin:8px 0 16px"><b>Forma de pagamento</b>'+
+  [["pix","PIX","Aprovação imediata"],["card","Cartão de crédito","Pague online"],["cash","Dinheiro","Pague na entrega"]].map(function(o){return '<label class="opt"><input type="radio" name="pay" value="'+o[0]+'"'+(pay===o[0]?' checked':'')+'><span>'+o[1]+'<small style="display:block;color:var(--mu);font-weight:400">'+o[2]+'</small></span></label>'}).join("")+'<div id="ext"></div>';
+  function ext(){var e=$("ext");
+   if(pay==="pix")e.innerHTML='<div class="pix">00020126…FRIGOFRUTAS<br>Exemplo de código PIX copia e cola.</div>';
+   else if(pay==="card")e.innerHTML='<input type="text" placeholder="Número do cartão" inputmode="numeric" aria-label="Número do cartão" style="margin-top:8px"><p class="note">Protótipo: nenhum dado é enviado.</p>';
+   else e.innerHTML='<input type="text" placeholder="Troco para quanto? (opcional)" aria-label="Troco" style="margin-top:8px">'}
+  ext();
+  b.querySelectorAll("[name=pay]").forEach(function(el){el.onchange=function(){pay=el.value;ext()}});
+  bar('<div class="sum t"><span>Total</span><span>'+brl(sub()+FEE)+'</span></div><button class="cta" id="ok">Confirmar pedido</button>');
+  $("ok").onclick=function(){go("track");steps()};
+ }else{
+  $("ttl").textContent="Acompanhar pedido";bar("");
+  var pm={pix:"PIX",card:"cartão de crédito",cash:"dinheiro na entrega"}[pay];
+  b.innerHTML='<b>Pedido #1258</b><p class="note" style="margin:2px 0">Pagamento: '+pm+' · Entrega em 25–35 min</p><ul class="steps" id="st"><li>Pedido confirmado</li><li>Preparando seu pedido</li><li>Saiu para entrega</li><li>Entregue</li></ul><button class="cta" id="new" style="width:100%;background:var(--g)">Fazer novo pedido</button>';
+  $("new").onclick=function(){cart={};go("home")};
+ }
+}
+var tm=[];
+function steps(){tm.forEach(clearTimeout);tm=[];var li=document.querySelectorAll("#st li");[0,1,2,3].forEach(function(i){tm.push(setTimeout(function(){if(li[i]&&view==="track")li[i].className="d"},i*1500))})}
+$("cartBtn").onclick=function(){go("cart")};
+render();
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
+</script>
+</body>
+</html>
