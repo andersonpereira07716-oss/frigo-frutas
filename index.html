@@ -1,506 +1,302 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Frigo Frutas - Frutas Frescas</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#16a34a">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: { green: '#16a34a', darkgreen: '#15803d', accent: '#facc15' }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frigo Frutas | Patos - PB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00875A">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: { green: '#00875A', darkGreen: '#005c3d', yellow: '#FFC72C', red: '#E31C23' }
+            }
           }
         }
       }
-    }
-  </script>
+    </script>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex flex-col justify-between pb-20">
+<body class="bg-gray-50 text-gray-800 font-sans pb-32">
 
-  <div>
-    <!-- Header Profissional -->
-    <header class="bg-brand-green text-white p-4 shadow-md sticky top-0 z-30 flex justify-between items-center">
-      <div class="flex items-center space-x-2">
-        <div>
-          <img src="logo_topo.png" alt="Frigo Frutas" class="h-11 w-auto" />
+    <!-- Header -->
+    <header class="bg-brand-green text-white sticky top-0 z-40 shadow-md">
+        <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <img src="logo.jpg" alt="Logo" class="h-10 w-auto rounded-lg border border-white/20 object-contain">
+                <div>
+                    <h1 class="font-extrabold text-sm tracking-wide leading-tight">Frigo Frutas</h1>
+                    <span id="loja-status" class="text-[10px] text-yellow-300 font-medium">Verificando horário...</span>
+                </div>
+            </div>
+            <button onclick="abrirCarrinho()" class="relative bg-brand-yellow text-gray-900 px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span id="contador-carrinho">0</span>
+            </button>
         </div>
-        <div>
-          <h1 class="text-lg font-extrabold tracking-wide leading-none">Frigo Frutas</h1>
-          <p id="store-status" class="text-[10px] text-green-100 mt-0.5 flex items-center gap-1 font-medium">
-            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> Aberto agora • Patos/PB
-          </p>
-        </div>
-      </div>
-      <div class="flex items-center space-x-2">
-        <button onclick="shareApp()" class="bg-green-700 p-2 rounded-full hover:bg-green-800 transition text-white text-xs" title="Partilhar App">
-          <i class="fa-solid fa-share-nodes text-sm"></i>
-        </button>
-        <button id="open-cart-btn" class="relative bg-brand-darkgreen p-2 rounded-full hover:bg-green-800 transition shadow">
-          <i class="fa-solid fa-shopping-cart text-base"></i>
-          <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
-        </button>
-      </div>
     </header>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed top-16 right-4 bg-gray-900 text-white px-4 py-2 rounded-xl shadow-xl text-xs font-bold z-50 transition transform translate-y-[-100px] opacity-0 flex items-center gap-2">
-      <i class="fa-solid fa-circle-check text-green-400 text-base"></i>
-      <span id="toast-msg">Item adicionado!</span>
-    </div>
-
-    <!-- Banner PWA -->
-    <div id="pwa-banner" class="bg-yellow-100 border-b border-yellow-300 p-3 text-xs text-yellow-900 flex justify-between items-center hidden">
-      <div class="flex items-center space-x-2">
-        <i class="fa-solid fa-mobile-screen text-yellow-700 text-base"></i>
-        <span>Instale o aplicativo na sua tela inicial!</span>
-      </div>
-      <button id="install-pwa-btn" class="bg-brand-green text-white font-bold px-3 py-1 rounded-lg text-xs shadow hover:bg-brand-darkgreen">
-        Instalar
-      </button>
-    </div>
-
-    <main class="max-w-4xl mx-auto px-4 py-6 w-full">
-      <!-- Banner Destaque -->
-      <section class="mb-6 bg-gradient-to-r from-green-700 to-emerald-600 rounded-2xl p-4 text-white shadow-md flex justify-between items-center">
-        <div>
-          <span class="bg-yellow-400 text-green-900 font-extrabold text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider">Especial de Frutas</span>
-          <h2 class="text-base font-bold mt-1">Frutas Frescas Selecionadas</h2>
-          <p class="text-xs text-green-100 mt-0.5">Use o cupom <span class="font-bold underline">FRIGO10</span> para 10% OFF!</p>
-        </div>
-        <div class="pl-2">
-          <img src="logo_banner.png" alt="Frigo Frutas" class="h-16 w-auto" />
-        </div>
-      </section>
-
-      <!-- Busca e Filtros -->
-      <section class="mb-6 space-y-3">
-        <div class="flex gap-2">
-          <div class="relative flex-grow">
-            <input type="text" id="search-input" placeholder="Buscar fruta desejada..." 
-                   class="w-full p-3 pl-10 rounded-xl border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-green text-sm bg-white">
-            <i class="fa-solid fa-search absolute left-3 top-3.5 text-gray-400"></i>
-          </div>
-          <select id="sort-select" onchange="sortProducts()" class="p-3 border border-gray-300 rounded-xl text-xs bg-white font-medium focus:outline-none">
-            <option value="default">Padrão</option>
-            <option value="low-price">Menor Preço</option>
-            <option value="high-price">Maior Preço</option>
-          </select>
+    <!-- Banner Promocional -->
+    <main class="max-w-md mx-auto p-4 space-y-4">
+        <div class="bg-gradient-to-r from-brand-green to-brand-darkGreen text-white p-4 rounded-2xl shadow-sm relative overflow-hidden">
+            <span class="bg-brand-yellow text-gray-900 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">Especial de Frutas</span>
+            <h2 class="text-lg font-black mt-1">Frutas Frescas Selecionadas</h2>
+            <p class="text-xs text-emerald-100 mt-0.5">Use o cupom <strong class="text-brand-yellow">FRIGO10</strong> no checkout para 10% OFF!</p>
         </div>
 
-        <div class="flex space-x-2 overflow-x-auto pb-2 scrollbar-none">
-          <button class="category-btn bg-brand-green text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap shadow" data-cat="todos">Todas as Frutas</button>
-          <button class="category-btn bg-white text-gray-700 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap border border-gray-200" data-cat="promocao">🔥 Ofertas</button>
+        <!-- Botao Repetir Ultimo Pedido -->
+        <div id="container-repetir" class="hidden">
+            <button onclick="repetirUltimoPedido()" class="w-full bg-emerald-50 border border-emerald-200 text-emerald-800 p-3 rounded-xl font-bold text-xs flex items-center justify-between shadow-sm">
+                <span class="flex items-center gap-2"><i class="fa-solid fa-rotate-right text-brand-green"></i> Repetir Último Pedido</span>
+                <span class="text-[10px] bg-emerald-200 px-2 py-0.5 rounded-full">Rápido</span>
+            </button>
         </div>
-      </section>
 
-      <!-- Grid de Frutas -->
-      <section id="products-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-      </section>
+        <!-- Barra de Pesquisa -->
+        <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-gray-400 text-sm"></i>
+            <input type="text" id="input-busca" oninput="filtrarProdutos()" placeholder="Buscar fruta desejada..." class="w-full bg-white pl-10 pr-4 py-3 rounded-xl text-xs border border-gray-200 focus:outline-none focus:border-brand-green shadow-sm">
+        </div>
+
+        <!-- Grid de Produtos -->
+        <div id="grid-produtos" class="grid grid-cols-2 gap-3">
+            <!-- Carregado via Supabase -->
+            <div class="col-span-2 text-center py-10 text-gray-400 text-xs">A carregar produtos frescos...</div>
+        </div>
     </main>
-  </div>
 
-  <!-- Rodapé Comercial -->
-  <footer class="bg-gray-900 text-gray-400 py-8 px-4 text-xs mt-12 border-t border-gray-800">
-    <div class="max-w-4xl mx-auto space-y-4 text-center sm:text-left sm:flex sm:justify-between sm:items-center sm:space-y-0">
-      <div>
-        <h3 class="text-white font-bold text-sm flex items-center justify-center sm:justify-start gap-1.5">
-          <i class="fa-solid fa-apple-whole text-yellow-400"></i> Frigo Frutas Patos
-        </h3>
-        <p class="mt-1">Qualidade e frescor garantidos todos os dias.</p>
-        <p class="text-gray-500 mt-0.5">Atendimento: Seg à Sáb das 07h às 18h</p>
-      </div>
-      <div class="flex justify-center space-x-4 text-lg">
-        <a href="https://instagram.com" target="_blank" class="text-gray-400 hover:text-pink-400 transition"><i class="fa-brands fa-instagram"></i></a>
-        <a href="https://wa.me/5583998765554" target="_blank" class="text-gray-400 hover:text-green-400 transition"><i class="fa-brands fa-whatsapp"></i></a>
-      </div>
-    </div>
-    <div class="max-w-4xl mx-auto text-center border-t border-gray-800 mt-6 pt-4 text-gray-600 text-[10px]">
-      &copy; 2026 Frigo Frutas - Todos os direitos reservados.
-    </div>
-  </footer>
-
-  <!-- Modal Detalhe do Produto -->
-  <div id="product-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl relative">
-      <button onclick="closeProductModal()" class="absolute top-3 right-3 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold z-10">&times;</button>
-      <img id="modal-img" src="" class="w-full h-48 object-cover">
-      <div class="p-4 space-y-2">
-        <span id="modal-cat" class="text-[10px] font-bold uppercase tracking-wider text-brand-green"></span>
-        <h3 id="modal-title" class="font-bold text-gray-800 text-lg"></h3>
-        <p id="modal-desc" class="text-xs text-gray-500 leading-relaxed"></p>
-        <div class="flex items-baseline gap-2 pt-1">
-          <span id="modal-price" class="text-brand-green font-extrabold text-xl"></span>
-          <span id="modal-old-price" class="text-gray-400 text-xs line-through"></span>
-        </div>
-        <button id="modal-add-btn" class="w-full bg-brand-green hover:bg-brand-darkgreen text-white font-bold py-3 rounded-xl transition mt-2 flex items-center justify-center gap-2 text-sm shadow">
-          <i class="fa-solid fa-cart-plus"></i> Adicionar ao Pedido
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal do Carrinho -->
-  <div id="cart-modal" class="fixed inset-0 bg-black/50 z-50 flex justify-end hidden">
-    <div class="bg-white w-full max-w-md h-full flex flex-col justify-between shadow-2xl">
-      <div class="bg-brand-green text-white p-4 flex justify-between items-center">
-        <h2 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-cart-shopping"></i> Seu Pedido</h2>
-        <div class="flex items-center gap-3">
-          <button onclick="clearCart()" class="text-xs bg-green-800 hover:bg-green-900 px-2 py-1 rounded text-white font-semibold">Limpar</button>
-          <button id="close-cart-btn" class="text-white text-xl font-bold hover:text-gray-200">&times;</button>
-        </div>
-      </div>
-
-      <div id="free-shipping-bar" class="bg-green-50 p-2.5 text-center text-xs font-semibold text-brand-green border-b border-green-200">
-        <span id="shipping-msg">Adicione produtos para calcular o frete!</span>
-      </div>
-
-      <div id="cart-items" class="p-4 flex-grow overflow-y-auto divide-y divide-gray-100"></div>
-
-      <div class="p-4 bg-gray-50 border-t border-gray-200 space-y-3 overflow-y-auto max-h-[55vh]">
-        <div class="flex gap-2">
-          <input type="text" id="coupon-code" placeholder="Cupom (ex: FRIGO10)" class="uppercase p-2 border rounded-lg text-xs bg-white flex-grow">
-          <button onclick="applyCoupon()" class="bg-gray-800 text-white font-bold px-3 text-xs rounded-lg hover:bg-black transition">Aplicar</button>
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Seu Nome:</label>
-          <input type="text" id="cust-name" placeholder="Ex: João Silva" class="w-full p-2 border rounded-lg text-sm bg-white">
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">Bairro (Patos-PB):</label>
-            <select id="cust-neighborhood" onchange="updateCartUI()" class="w-full p-2 border rounded-lg text-sm bg-white font-medium">
-              <option value="Centro" data-fee="3.00">Centro (R$ 3,00)</option>
-              <option value="Brasília" data-fee="4.00">Brasília (R$ 4,00)</option>
-              <option value="Belo Horizonte" data-fee="4.00">Belo Horizonte (R$ 4,00)</option>
-              <option value="Jatobá" data-fee="5.00">Jatobá (R$ 5,00)</option>
-              <option value="Maternidade" data-fee="4.00">Maternidade (R$ 4,00)</option>
-              <option value="Outro" data-fee="6.00">Outro Bairro (R$ 6,00)</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">Entrega:</label>
-            <select id="delivery-time" class="w-full p-2 border rounded-lg text-sm bg-white">
-              <option value="Imediata">Imediata</option>
-              <option value="Turno Manhã">Turno Manhã</option>
-              <option value="Turno Tarde">Turno Tarde</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Endereço Completo:</label>
-          <input type="text" id="cust-address" placeholder="Rua, número e referência" class="w-full p-2 border rounded-lg text-sm bg-white">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Observações do Pedido (Opcional):</label>
-          <input type="text" id="order-notes" placeholder="Ex: Frutas bem maduras..." class="w-full p-2 border rounded-lg text-sm bg-white">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Forma de Pagamento:</label>
-          <select id="payment-method" onchange="togglePayFields()" class="w-full p-2 border rounded-lg text-sm bg-white">
-            <option value="Pix">Pix (Chave Instantânea)</option>
-            <option value="Dinheiro">Dinheiro</option>
-            <option value="Cartão">Cartão na Entrega</option>
-          </select>
-        </div>
-
-        <div id="change-box" class="hidden">
-          <label class="block text-xs font-semibold text-gray-600 mb-1">Troco para quanto?</label>
-          <input type="number" id="cash-change" placeholder="Ex: 50" class="w-full p-2 border rounded-lg text-sm bg-white">
-        </div>
-
-        <div id="pix-box" class="bg-green-50 p-3 rounded-lg border border-green-200 text-xs text-green-900 space-y-1">
-          <p class="font-bold"><i class="fa-solid fa-qrcode mr-1"></i> Chave Pix (Celular):</p>
-          <div class="flex items-center justify-between bg-white p-2 rounded border border-green-300">
-            <span id="pix-key" class="font-mono font-bold select-all">83998765554</span>
-            <button onclick="copyPixKey()" class="text-brand-green font-bold text-xs hover:underline">Copiar</button>
-          </div>
-        </div>
-
-        <div class="border-t pt-2 space-y-1 text-sm">
-          <div class="flex justify-between text-gray-500"><span>Subtotal:</span><span id="cart-subtotal">R$ 0,00</span></div>
-          <div class="flex justify-between text-gray-500"><span>Desconto:</span><span id="cart-discount" class="text-red-500">- R$ 0,00</span></div>
-          <div class="flex justify-between text-gray-500"><span>Taxa de Entrega:</span><span id="cart-fee">R$ 0,00</span></div>
-          <div class="flex justify-between items-center text-base font-bold text-gray-800 border-t pt-1">
-            <span>Total Final:</span><span id="cart-total" class="text-brand-green text-xl">R$ 0,00</span>
-          </div>
-        </div>
-
-        <button onclick="submitOrder()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
-          <i class="fa-brands fa-whatsapp text-lg"></i> Confirmar Pedido no WhatsApp
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const fallbackImage = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='100%25' height='100%25' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='20' fill='%2316a34a' text-anchor='middle' dominant-baseline='middle'%3EFrigo Frutas%3C/text%3E%3C/svg%3E";
-
-    // Catálogo 100% composto por Frutas
-    const products = [
-      { id: 1, name: "Maçã Fuji (kg)", price: 8.50, oldPrice: 10.00, category: "frutas", isPromo: true, image: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80", desc: "Maçãs doces e crocantes selecionadas diariamente." },
-      { id: 2, name: "Banana Prata (kg)", price: 6.00, oldPrice: null, category: "frutas", isPromo: false, image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&q=80", desc: "Bananas frescas e prontas para o consumo saudável." },
-      { id: 3, name: "Manga Palmer (kg)", price: 7.00, oldPrice: 8.50, category: "frutas", isPromo: true, image: "https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=400&q=80", desc: "Manga Palmer doce, sem fiapos e extremamente suculenta." },
-      { id: 4, name: "Melancia Inteira (Unid)", price: 15.00, oldPrice: null, category: "frutas", isPromo: false, image: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=400&q=80", desc: "Melancia vermelhinha e super doce para refrescar o seu dia." },
-      { id: 5, name: "Laranja Pera (kg)", price: 5.50, oldPrice: 7.00, category: "frutas", isPromo: true, image: "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=400&q=80", desc: "Laranjas bem suculentas ideais para sucos naturais frescos." },
-      { id: 6, name: "Morango Fresco (Band)", price: 9.00, oldPrice: null, category: "frutas", isPromo: false, image: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&w=400&q=80", desc: "Morangos vermelhos e selecionados diretamente do produtor." }
-    ];
-
-    let currentProducts = [...products];
-    let cart = [], discountPercent = 0, deferredPrompt;
-
-    function playBeep() {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = 587.33;
-        gain.gain.setValueAtTime(0.1, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.15);
-      } catch (e) {}
-    }
-
-    function renderProducts(items) {
-      const grid = document.getElementById('products-grid');
-      grid.innerHTML = items.length === 0 ? `<p class="col-span-full text-center text-gray-500 py-8 text-sm">Nenhuma fruta encontrada.</p>` :
-        items.map(p => `
-          <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition relative">
-            ${p.isPromo ? `<span class="absolute top-2 right-2 bg-red-500 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider z-10 shadow">Oferta</span>` : ''}
-            <div onclick="openProductModal(${p.id})" class="h-32 bg-gray-100 overflow-hidden relative cursor-pointer">
-              <img src="${p.image}" onerror="this.src='${fallbackImage}'" alt="${p.name}" class="w-full h-full object-cover hover:scale-105 transition duration-300">
+    <!-- Modal do Carrinho -->
+    <div id="modal-carrinho" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-4 bg-gray-50 border-b flex items-center justify-between">
+                <h3 class="font-bold text-sm text-gray-900"><i class="fa-solid fa-bag-shopping text-brand-green mr-1"></i> Seu Carrinho</h3>
+                <button onclick="fecharCarrinho()" class="text-gray-400 hover:text-gray-600 text-lg px-2">&times;</button>
             </div>
-            <div class="p-3 flex flex-col justify-between flex-grow">
-              <div onclick="openProductModal(${p.id})" class="cursor-pointer">
-                <span class="text-[9px] font-bold uppercase tracking-wider text-gray-400">Frutas</span>
-                <h3 class="font-bold text-gray-800 text-xs sm:text-sm leading-tight mt-0.5">${p.name}</h3>
-                <div class="flex items-baseline gap-1 mt-1.5">
-                  <span class="text-brand-green font-extrabold text-sm sm:text-base">R$ ${p.price.toFixed(2).replace('.', ',')}</span>
-                  ${p.oldPrice ? `<span class="text-gray-400 text-[10px] line-through">R$ ${p.oldPrice.toFixed(2).replace('.', ',')}</span>` : ''}
+            
+            <div id="lista-carrinho" class="p-4 overflow-y-auto flex-1 space-y-3 divide-y divide-gray-100">
+                <!-- Itens -->
+            </div>
+
+            <div class="p-4 bg-gray-50 border-t space-y-3">
+                <!-- Seletor de Bairro -->
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-700 mb-1">Selecione o Bairro em Patos/PB:</label>
+                    <select id="select-bairro" onchange="atualizarTotais()" class="w-full bg-white border border-gray-200 rounded-xl p-2.5 text-xs font-medium text-gray-800 focus:outline-none focus:border-brand-green">
+                        <option value="5.00">Centro (R$ 5,00)</option>
+                        <option value="7.00">Belo Horizonte (R$ 7,00)</option>
+                        <option value="7.00">Brasília (R$ 7,00)</option>
+                        <option value="8.00">Mato Grosso (R$ 8,00)</option>
+                        <option value="10.00">Outros Bairros / Periferia (R$ 10,00)</option>
+                    </select>
                 </div>
-              </div>
-              <button onclick="addToCart(${p.id})" class="mt-3 w-full bg-brand-green hover:bg-brand-darkgreen text-white text-xs font-bold py-2 rounded-lg transition flex items-center justify-center gap-1 shadow-sm">
-                <i class="fa-solid fa-plus text-[10px]"></i> Adicionar
-              </button>
+
+                <!-- Cupom -->
+                <div class="flex gap-2">
+                    <input type="text" id="input-cupom" placeholder="Cupom (ex: FRIGO10)" class="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs uppercase font-bold">
+                    <button onclick="aplicarCupom()" class="bg-gray-800 text-white px-4 py-2 rounded-xl text-xs font-bold">Aplicar</button>
+                </div>
+
+                <!-- Totais -->
+                <div class="space-y-1 text-xs text-gray-600 pt-2 border-t">
+                    <div class="flex justify-between"><span>Subtotal:</span> <span id="val-subtotal">R$ 0,00</span></div>
+                    <div class="flex justify-between"><span>Taxa de Entrega:</span> <span id="val-frete">R$ 5,00</span></div>
+                    <div id="linha-desconto" class="flex justify-between text-emerald-600 font-bold hidden"><span>Desconto (FRIGO10):</span> <span id="val-desconto">-R$ 0,00</span></div>
+                    <div class="flex justify-between text-sm font-black text-gray-900 pt-1 border-t"><span>Total:</span> <span id="val-total" class="text-brand-green">R$ 0,00</span></div>
+                </div>
+
+                <button onclick="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-base"></i> Enviar Pedido via WhatsApp
+                </button>
             </div>
-          </div>
-        `).join('');
-    }
+        </div>
+    </div>
 
-    function sortProducts() {
-      const mode = document.getElementById('sort-select').value;
-      let sorted = [...currentProducts];
-      if (mode === 'low-price') sorted.sort((a, b) => a.price - b.price);
-      else if (mode === 'high-price') sorted.sort((a, b) => b.price - a.price);
-      renderProducts(sorted);
-    }
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://cfihhckmgqbnkpyfujam.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmaWhoY2ttZ3FibmtweWZ1amFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTYyNTQsImV4cCI6MjEwNzg3MjI1NH0.GTCMCrTrfa-1ISEe3eK-bxRz3-8rn_ZRJJqmJzTQDQo';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    function openProductModal(id) {
-      const p = products.find(prod => prod.id === id);
-      if (!p) return;
-      const modalImg = document.getElementById('modal-img');
-      modalImg.src = p.image;
-      modalImg.onerror = function() { this.src = fallbackImage; };
-      document.getElementById('modal-cat').innerText = "Frutas";
-      document.getElementById('modal-title').innerText = p.name;
-      document.getElementById('modal-desc').innerText = p.desc;
-      document.getElementById('modal-price').innerText = `R$ ${p.price.toFixed(2).replace('.', ',')}`;
-      document.getElementById('modal-old-price').innerText = p.oldPrice ? `R$ ${p.oldPrice.toFixed(2).replace('.', ',')}` : '';
-      document.getElementById('modal-add-btn').onclick = () => { addToCart(p.id); closeProductModal(); };
-      document.getElementById('product-modal').classList.remove('hidden');
-    }
+        let produtosGlobais = [];
+        let carrinho = [];
+        let descontoAplicado = 0;
 
-    function closeProductModal() {
-      document.getElementById('product-modal').classList.add('hidden');
-    }
+        // Verificar Horário de Funcionamento (07:00 às 19:00)
+        function verificarStatusLoja() {
+            const agora = new Date();
+            const hora = agora.getHours();
+            const statusEl = document.getElementById('loja-status');
+            if (hora >= 7 && hora < 19) {
+                statusEl.innerHTML = '<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 mr-1 animate-pulse"></span> Aberto agora • Patos/PB';
+            } else {
+                statusEl.innerHTML = '<span class="inline-block w-2 h-2 rounded-full bg-red-400 mr-1"></span> Fechado no momento ( Abre às 07:00 )';
+            }
+        }
 
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      document.getElementById('toast-msg').innerText = msg;
-      toast.classList.remove('translate-y-[-100px]', 'opacity-0');
-      toast.classList.add('translate-y-0', 'opacity-100');
-      setTimeout(() => {
-        toast.classList.remove('translate-y-0', 'opacity-100');
-        toast.classList.add('translate-y-[-100px]', 'opacity-0');
-      }, 2000);
-    }
+        async function carregarProdutos() {
+            const { data, error } = await supabaseClient.from('produtos').select('*').eq('disponivel', true);
+            if (!error && data) {
+                produtosGlobais = data;
+                renderizarProdutos(produtosGlobais);
+            }
+        }
 
-    function addToCart(id) {
-      playBeep();
-      const prod = products.find(p => p.id === id), item = cart.find(c => c.id === id);
-      if (item) item.qty++; else cart.push({ ...prod, qty: 1 });
-      updateCartUI();
-      showToast(`${prod.name} adicionado!`);
-    }
+        function renderizarProdutos(lista) {
+            const container = document.getElementById('grid-produtos');
+            container.innerHTML = lista.map(p => `
+                <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between">
+                    <div>
+                        <div class="relative mb-2">
+                            <img src="${p.imagem}" class="w-full h-28 object-cover rounded-xl">
+                            ${p.em_oferta ? '<span class="absolute top-1.5 left-1.5 bg-red-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase">Oferta</span>' : ''}
+                        </div>
+                        <h4 class="font-bold text-gray-900 text-xs mb-1 line-clamp-1">${p.nome}</h4>
+                        <div class="flex items-baseline gap-1.5 mb-2">
+                            <span class="text-sm font-black text-emerald-700">R$ ${Number(p.em_oferta ? p.preco_oferta : p.preco).toFixed(2)}</span>
+                            ${p.em_oferta ? `<span class="text-[10px] text-gray-400 line-through">R$ ${Number(p.preco).toFixed(2)}</span>` : ''}
+                        </div>
+                    </div>
+                    <button onclick="adicionarCarrinho(${p.id})" class="w-full bg-brand-green text-white font-bold py-2 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow-sm">
+                        <i class="fa-solid fa-plus text-[10px]"></i> Adicionar
+                    </button>
+                </div>
+            `).join('');
+        }
 
-    function clearCart() {
-      if (cart.length === 0) return;
-      if (confirm('Deseja limpar todo o carrinho?')) {
-        cart = [];
-        updateCartUI();
-        showToast('Carrinho limpo!');
-      }
-    }
+        function filtrarProdutos() {
+            const termo = document.getElementById('input-busca').value.toLowerCase();
+            const filtrados = produtosGlobais.filter(p => p.nome.toLowerCase().includes(termo));
+            renderizarProdutos(filtrados);
+        }
 
-    function applyCoupon() {
-      const code = document.getElementById('coupon-code').value.trim().toUpperCase();
-      if (code === 'FRIGO10') {
-        discountPercent = 0.10;
-        showToast('Cupom de 10% aplicado!');
-      } else {
-        discountPercent = 0;
-        alert('Cupom inválido.');
-      }
-      updateCartUI();
-    }
+        function adicionarCarrinho(id) {
+            const produto = produtosGlobais.find(p => p.id === id);
+            const itemExistente = carrinho.find(i => i.id === id);
+            const precoFinal = produto.em_oferta ? produto.preco_oferta : produto.preco;
 
-    function togglePayFields() {
-      const method = document.getElementById('payment-method').value;
-      document.getElementById('pix-box').style.display = method === 'Pix' ? 'block' : 'none';
-      document.getElementById('change-box').style.display = method === 'Dinheiro' ? 'block' : 'none';
-    }
+            if (itemExistente) {
+                itemExistente.qtd++;
+            } else {
+                carrinho.push({ id: produto.id, nome: produto.nome, preco: precoFinal, qtd: 1 });
+            }
+            atualizarContador();
+        }
 
-    function updateCartUI() {
-      const cartItems = document.getElementById('cart-items'), cartCount = document.getElementById('cart-count');
-      const subtotalEl = document.getElementById('cart-subtotal'), feeEl = document.getElementById('cart-fee'), totalEl = document.getElementById('cart-total'), discountEl = document.getElementById('cart-discount');
-      const shippingMsg = document.getElementById('shipping-msg');
+        function atualizarContador() {
+            const totalQtd = carrinho.reduce((sum, i) => sum + i.qtd, 0);
+            document.getElementById('contador-carrinho').innerText = totalQtd;
+        }
 
-      const selectNeighborhood = document.getElementById('cust-neighborhood');
-      let baseFee = parseFloat(selectNeighborhood.options[selectNeighborhood.selectedIndex].getAttribute('data-fee') || 0);
+        function abrirCarrinho() {
+            const lista = document.getElementById('lista-carrinho');
+            if (carrinho.length === 0) {
+                lista.innerHTML = '<p class="text-center text-gray-400 text-xs py-6">O seu carrinho está vazio.</p>';
+            } else {
+                lista.innerHTML = carrinho.map((i, index) => `
+                    <div class="flex items-center justify-between py-2 text-xs">
+                        <div>
+                            <p class="font-bold text-gray-900">${i.nome}</p>
+                            <p class="text-gray-500 text-[10px]">R$ ${Number(i.preco).toFixed(2)} un</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="mudarQtd(${index}, -1)" class="w-6 h-6 bg-gray-100 rounded-lg font-bold text-gray-600">-</button>
+                            <span class="font-bold text-xs">${i.qtd}</span>
+                            <button onclick="mudarQtd(${index}, 1)" class="w-6 h-6 bg-gray-100 rounded-lg font-bold text-gray-600">+</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            atualizarTotais();
+            document.getElementById('modal-carrinho').classList.remove('hidden');
+        }
 
-      const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
-      const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+        function fecharCarrinho() {
+            document.getElementById('modal-carrinho').classList.add('hidden');
+        }
 
-      let fee = subtotal > 0 ? baseFee : 0;
+        function mudarQtd(index, delta) {
+            carrinho[index].qtd += delta;
+            if (carrinho[index].qtd <= 0) carrinho.splice(index, 1);
+            abrirCarrinho();
+            atualizarContador();
+        }
 
-      if (subtotal === 0) {
-        shippingMsg.innerText = "Adicione produtos para calcular o frete!";
-      } else if (subtotal >= 30) {
-        fee = 0;
-        shippingMsg.innerText = "🎉 Parabéns! Você ganhou Frete Grátis!";
-      } else {
-        const missing = 30 - subtotal;
-        shippingMsg.innerText = `Adicione mais R$ ${missing.toFixed(2).replace('.', ',')} para Frete Grátis!`;
-      }
+        function aplicarCupom() {
+            const codigo = document.getElementById('input-cupom').value.trim().toUpperCase();
+            const subtotal = carrinho.reduce((sum, i) => sum + (i.preco * i.qtd), 0);
+            if (codigo === 'FRIGO10') {
+                descontoAplicado = subtotal * 0.10;
+                document.getElementById('linha-desconto').classList.remove('hidden');
+                document.getElementById('val-desconto').innerText = `-R$ ${descontoAplicado.toFixed(2)}`;
+                alert('Cupom FRIGO10 aplicado com sucesso (10% OFF)!');
+            } else {
+                descontoAplicado = 0;
+                document.getElementById('linha-desconto').classList.add('hidden');
+                alert('Cupom inválido.');
+            }
+            atualizarTotais();
+        }
 
-      const discountVal = subtotal * discountPercent;
-      const total = subtotal > 0 ? (subtotal - discountVal) + fee : 0;
+        function atualizarTotais() {
+            const subtotal = carrinho.reduce((sum, i) => sum + (i.preco * i.qtd), 0);
+            const frete = parseFloat(document.getElementById('select-bairro').value);
+            const total = Math.max(0, subtotal - descontoAplicado) + frete;
 
-      if (totalItems > 0) { cartCount.innerText = totalItems; cartCount.classList.remove('hidden'); } else { cartCount.classList.add('hidden'); }
+            document.getElementById('val-subtotal').innerText = `R$ ${subtotal.toFixed(2)}`;
+            document.getElementById('val-frete').innerText = `R$ ${frete.toFixed(2)}`;
+            document.getElementById('val-total').innerText = `R$ ${total.toFixed(2)}`;
+        }
 
-      subtotalEl.innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
-      discountEl.innerText = `- R$ ${discountVal.toFixed(2).replace('.', ',')}`;
-      feeEl.innerText = subtotal > 0 ? (fee === 0 ? 'GRÁTIS' : `R$ ${fee.toFixed(2).replace('.', ',')}`) : 'R$ 0,00';
-      totalEl.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        function enviarPedidoWhatsApp() {
+            if (carrinho.length === 0) return alert('Adicione itens ao carrinho.');
+            const bairroSelect = document.getElementById('select-bairro');
+            const nomeBairro = bairroSelect.options[bairroSelect.selectedIndex].text;
+            const frete = parseFloat(bairroSelect.value);
+            const subtotal = carrinho.reduce((sum, i) => sum + (i.preco * i.qtd), 0);
+            const total = Math.max(0, subtotal - descontoAplicado) + frete;
 
-      cartItems.innerHTML = cart.length === 0 ? `<p class="text-center text-gray-400 py-10 text-sm">Seu carrinho está vazio.</p>` :
-        cart.map(item => `
-          <div class="py-3 flex justify-between items-center">
-            <div><h4 class="font-bold text-sm text-gray-800">${item.name}</h4><p class="text-xs text-gray-500">R$ ${item.price.toFixed(2).replace('.', ',')} x ${item.qty}</p></div>
-            <div class="flex items-center space-x-2">
-              <button onclick="changeQty(${item.id}, -1)" class="w-6 h-6 bg-gray-200 text-gray-700 font-bold rounded-full flex items-center justify-center text-xs">-</button>
-              <span class="text-xs font-bold">${item.qty}</span>
-              <button onclick="changeQty(${item.id}, 1)" class="w-6 h-6 bg-brand-green text-white font-bold rounded-full flex items-center justify-center text-xs">+</button>
-            </div>
-          </div>
-        `).join('');
-    }
+            // Guardar ultimo pedido no localStorage
+            localStorage.setItem('frigo_ultimo_pedido', JSON.stringify(carrinho));
 
-    function changeQty(id, delta) {
-      const item = cart.find(c => c.id === id);
-      if (!item) return;
-      item.qty += delta;
-      if (item.qty <= 0) cart = cart.filter(c => c.id !== id);
-      updateCartUI();
-    }
+            let texto = `🛒 *NOVO PEDIDO - FRIGO FRUTAS*\n\n`;
+            carrinho.forEach(i => {
+                texto += `• ${i.qtd}x ${i.nome} (R$ ${(i.preco * i.qtd).toFixed(2)})\n`;
+            });
+            texto += `\n📍 *Bairro:* ${nomeBairro}`;
+            texto += `\n📦 *Subtotal:* R$ ${subtotal.toFixed(2)}`;
+            if (descontoAplicado > 0) texto += `\n🎟️ *Desconto:* -R$ ${descontoAplicado.toFixed(2)}`;
+            texto += `\n🛵 *Taxa de Entrega:* R$ ${frete.toFixed(2)}`;
+            texto += `\n💰 *TOTAL A PAGAR:* *R$ ${total.toFixed(2)}*\n\nEnviado via App Oficial Patos/PB.`;
 
-    function shareApp() {
-      if (navigator.share) {
-        navigator.share({ title: 'Frigo Frutas App', url: window.location.href });
-      } else {
-        navigator.clipboard.writeText(window.location.href);
-        showToast('Link do App copiado!');
-      }
-    }
+            const url = `https://wa.me/5583998765554?text=${encodeURIComponent(texto)}`;
+            window.open(url, '_blank');
+        }
 
-    document.getElementById('search-input').addEventListener('input', (e) => {
-      const term = e.target.value.toLowerCase();
-      currentProducts = products.filter(p => p.name.toLowerCase().includes(term));
-      sortProducts();
-    });
+        function verificarUltimoPedido() {
+            const salvo = localStorage.getItem('frigo_ultimo_pedido');
+            if (salvo) {
+                document.getElementById('container-repetir').classList.remove('hidden');
+            }
+        }
 
-    document.querySelectorAll('.category-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        document.querySelectorAll('.category-btn').forEach(b => b.className = "category-btn bg-white text-gray-700 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap border border-gray-200");
-        e.target.className = "category-btn bg-brand-green text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap shadow";
-        const cat = e.target.getAttribute('data-cat');
-        if (cat === 'todos') currentProducts = [...products];
-        else if (cat === 'promocao') currentProducts = products.filter(p => p.isPromo);
-        sortProducts();
-      });
-    });
+        function repetirUltimoPedido() {
+            const salvo = localStorage.getItem('frigo_ultimo_pedido');
+            if (salvo) {
+                carrinho = JSON.parse(salvo);
+                atualizarContador();
+                abrirCarrinho();
+            }
+        }
 
-    function copyPixKey() {
-      navigator.clipboard.writeText(document.getElementById('pix-key').innerText);
-      showToast('Chave Pix copiada!');
-    }
-
-    function submitOrder() {
-      if (cart.length === 0) { alert('Adicione pelo menos um produto!'); return; }
-      const name = document.getElementById('cust-name').value.trim();
-      const address = document.getElementById('cust-address').value.trim();
-      const neighborhood = document.getElementById('cust-neighborhood').value;
-      const deliveryTime = document.getElementById('delivery-time').value;
-      const payment = document.getElementById('payment-method').value;
-      const cashChange = document.getElementById('cash-change').value;
-      const notes = document.getElementById('order-notes').value.trim();
-
-      const selectNeighborhood = document.getElementById('cust-neighborhood');
-      let baseFee = parseFloat(selectNeighborhood.options[selectNeighborhood.selectedIndex].getAttribute('data-fee') || 0);
-
-      if (!name || !address) { alert('Preencha seu nome e endereço.'); return; }
-
-      const subtotal = cart.reduce((a, b) => a + (b.price * b.qty), 0);
-      const fee = subtotal >= 30 ? 0 : baseFee;
-      const discountVal = subtotal * discountPercent;
-      const total = (subtotal - discountVal) + fee;
-
-      let text = `🛒 *NOVO PEDIDO - FRIGO FRUTAS*\n\n`;
-      text += `👤 *Cliente:* ${name}\n`;
-      text += `📍 *Endereço:* ${address} (${neighborhood} - Patos/PB)\n`;
-      text += `⏰ *Horário:* ${deliveryTime}\n`;
-      text += `💳 *Pagamento:* ${payment}\n`;
-      if (payment === 'Dinheiro' && cashChange) text += `💵 *Troco para:* R$ ${cashChange}\n`;
-      if (notes) text += `📝 *Obs:* ${notes}\n`;
-      text += `\n📦 *Itens do Pedido:*\n`;
-      cart.forEach(i => text += `- ${i.qty}x ${i.name} (R$ ${(i.price * i.qty).toFixed(2).replace('.', ',')})\n`);
-      if (discountVal > 0) text += `\n🎟️ *Desconto:* - R$ ${discountVal.toFixed(2).replace('.', ',')}\n`;
-      text += `🛵 *Entrega:* ${fee === 0 ? 'GRÁTIS' : 'R$ ' + fee.toFixed(2).replace('.', ',')}\n`;
-      text += `💰 *TOTAL:* R$ ${total.toFixed(2).replace('.', ',')}`;
-
-      window.open(`https://wa.me/5583998765554?text=${encodeURIComponent(text)}`, '_blank');
-    }
-
-    document.getElementById('open-cart-btn').addEventListener('click', () => document.getElementById('cart-modal').classList.remove('hidden'));
-    document.getElementById('close-cart-btn').addEventListener('click', () => document.getElementById('cart-modal').classList.add('hidden'));
-
-    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('pwa-banner').classList.remove('hidden'); });
-    document.getElementById('install-pwa-btn').addEventListener('click', () => { if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; document.getElementById('pwa-banner').classList.add('hidden'); }); } });
-
-    renderProducts(products);
-    updateCartUI();
-  </script>
+        window.onload = () => {
+            verificarStatusLoja();
+            carregarProdutos();
+            verificarUltimoPedido();
+        };
+    </script>
 </body>
 </html>
