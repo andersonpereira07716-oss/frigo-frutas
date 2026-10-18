@@ -12,6 +12,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#00875A">
+    
+    <!-- Preconnect com servidores de imagem para acelerar o carregamento -->
+    <link rel="preconnect" href="https://images.unsplash.com">
+    
     <script>
       tailwind.config = {
         theme: {
@@ -27,7 +31,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased pb-32">
 
-    <!-- Header Fixo Limpo -->
+    <!-- Header Fixo -->
     <header class="bg-brand-green text-white sticky top-0 z-40 shadow-md">
         <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-2.5">
@@ -44,11 +48,11 @@
         </div>
     </header>
 
-    <!-- Conteudo Principal -->
-    <main class="max-w-md mx-auto px-4 pt-4 space-y-4">
+    <!-- Conteudo Principal com Espacamento Superior Adequado -->
+    <main class="max-w-md mx-auto px-4 pt-3 space-y-3">
         
         <!-- Banner Promocional -->
-        <div class="bg-gradient-to-r from-brand-green to-brand-darkGreen text-white p-4 rounded-2xl shadow-sm relative overflow-hidden">
+        <div class="bg-gradient-to-r from-brand-green to-brand-darkGreen text-white p-3.5 rounded-2xl shadow-sm relative overflow-hidden">
             <span class="bg-brand-yellow text-gray-900 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">Especial de Frutas</span>
             <h2 class="text-base font-black mt-1">Frutas Frescas Selecionadas</h2>
             <p class="text-xs text-emerald-100 mt-0.5">Use o cupom <strong class="text-brand-yellow">FRIGO10</strong> no checkout para 10% OFF!</p>
@@ -68,16 +72,14 @@
             <input type="text" id="input-busca" oninput="filtrarProdutos()" placeholder="Buscar fruta desejada..." class="w-full bg-white pl-10 pr-4 py-2.5 rounded-xl text-xs border border-gray-200 focus:outline-none focus:border-brand-green shadow-sm">
         </div>
 
-        <!-- Filtros por Categoria / Tag (Restaurados) -->
+        <!-- Filtros por Categoria -->
         <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
             <button onclick="filtrarCategoria('todas')" id="btn-cat-todas" class="bg-brand-green text-white font-bold px-3.5 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm">Todas as Frutas</button>
             <button onclick="filtrarCategoria('ofertas')" id="btn-cat-ofertas" class="bg-white border border-gray-200 text-gray-700 font-bold px-3.5 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm flex items-center gap-1"><i class="fa-solid fa-fire text-orange-500"></i> Ofertas</button>
         </div>
 
-        <!-- Grid de Produtos -->
-        <div id="grid-produtos" class="grid grid-cols-2 gap-3 pt-1">
-            <div class="col-span-2 text-center py-10 text-gray-400 text-xs">Carregando catálogo do Supabase...</div>
-        </div>
+        <!-- Grid de Produtos Instantaneo -->
+        <div id="grid-produtos" class="grid grid-cols-2 gap-3 pt-1"></div>
 
     </main>
 
@@ -132,7 +134,15 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmaWhoY2ttZ3FibmtweWZ1amFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTYyNTQsImV4cCI6MjEwNzg3MjI1NH0.GTCMCrTrfa-1ISEe3eK-bxRz3-8rn_ZRJJqmJzTQDQo';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let produtosGlobais = [];
+        // Catálogo local para exibição instantânea imediata
+        let produtosGlobais = [
+            { id: 1, nome: "Maçã Fuji (Kg)", categoria: "Frutas", preco: 8.99, preco_oferta: 6.99, em_oferta: true, imagem: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80" },
+            { id: 2, nome: "Banana Prata (Kg)", categoria: "Frutas", preco: 5.49, preco_oferta: null, em_oferta: false, imagem: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&q=80" },
+            { id: 3, nome: "Uva Vitória Sem Semente (500g)", categoria: "Frutas", preco: 9.90, preco_oferta: 7.90, em_oferta: true, imagem: "https://images.unsplash.com/photo-1537640538966-79f369143f8f?auto=format&fit=crop&w=400&q=80" },
+            { id: 4, nome: "Laranja Pera (Kg)", categoria: "Frutas", preco: 4.29, preco_oferta: null, em_oferta: false, imagem: "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=400&q=80" },
+            { id: 5, nome: "Melancia Inteira (Unid)", categoria: "Frutas", preco: 14.90, preco_oferta: 11.90, em_oferta: true, imagem: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=400&q=80" }
+        ];
+
         let carrinho = [];
         let descontoAplicado = 0;
         let filtroAtual = 'todas';
@@ -147,11 +157,15 @@
             }
         }
 
-        async function carregarProdutos() {
-            const { data, error } = await supabaseClient.from('produtos').select('*').eq('disponivel', true).order('id', { ascending: true });
-            if (!error && data) {
-                produtosGlobais = data;
-                renderizarProdutos(produtosGlobais);
+        async function sincronizarSupabase() {
+            try {
+                const { data, error } = await supabaseClient.from('produtos').select('*').eq('disponivel', true).order('id', { ascending: true });
+                if (!error && data && data.length > 0) {
+                    produtosGlobais = data;
+                    renderizarProdutos(produtosGlobais);
+                }
+            } catch (e) {
+                console.log('Usando catálogo pré-carregado local.');
             }
         }
 
@@ -164,9 +178,9 @@
             container.innerHTML = lista.map(p => `
                 <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between">
                     <div>
-                        <div class="relative mb-2">
-                            <img src="${p.imagem}" class="w-full h-28 object-cover rounded-xl">
-                            ${p.em_oferta ? '<span class="absolute top-1.5 left-1.5 bg-red-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase">Oferta</span>' : ''}
+                        <div class="relative mb-2 bg-gray-100 rounded-xl overflow-hidden min-h-[112px]">
+                            <img src="${p.imagem}" loading="eager" decoding="async" class="w-full h-28 object-cover rounded-xl transition duration-300">
+                            ${p.em_oferta ? '<span class="absolute top-1.5 left-1.5 bg-red-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider">Oferta</span>' : ''}
                         </div>
                         <span class="text-[10px] text-gray-400 uppercase font-semibold tracking-wider">FRUTAS</span>
                         <h4 class="font-bold text-gray-900 text-xs mb-1 line-clamp-1">${p.nome}</h4>
@@ -175,7 +189,7 @@
                             ${p.em_oferta && p.preco ? `<span class="text-[10px] text-gray-400 line-through">R$ ${Number(p.preco).toFixed(2)}</span>` : ''}
                         </div>
                     </div>
-                    <button onclick="adicionarCarrinho(${p.id})" class="w-full bg-brand-green hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow-sm transition">
+                    <button onclick="adicionarCarrinho(${p.id})" class="w-full bg-brand-green hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow-sm transition active:scale-95">
                         <i class="fa-solid fa-plus text-[10px]"></i> Adicionar
                     </button>
                 </div>
@@ -326,7 +340,8 @@
 
         window.onload = () => {
             verificarStatusLoja();
-            carregarProdutos();
+            renderizarProdutos(produtosGlobais); // Renderiza INSTANTANEAMENTE ao abrir
+            sincronizarSupabase();               // Sincroniza em segundo plano
             verificarUltimoPedido();
         };
     </script>
