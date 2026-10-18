@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Frigo Frutas | Patos - PB</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="manifest" href="manifest.json">
@@ -12,6 +16,7 @@
       tailwind.config = {
         theme: {
           extend: {
+            fontFamily: { sans: ['Inter', 'sans-serif'] },
             colors: {
               brand: { green: '#00875A', darkGreen: '#005c3d', yellow: '#FFC72C', red: '#E31C23' }
             }
@@ -20,30 +25,32 @@
       }
     </script>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans pb-32">
+<body class="bg-gray-50 text-gray-800 font-sans antialiased pb-32">
 
-    <!-- Header -->
+    <!-- Header Fixo Limpo -->
     <header class="bg-brand-green text-white sticky top-0 z-40 shadow-md">
         <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2.5">
                 <img src="logo.jpg" alt="Logo" class="h-10 w-auto rounded-lg border border-white/20 object-contain">
                 <div>
                     <h1 class="font-extrabold text-sm tracking-wide leading-tight">Frigo Frutas</h1>
-                    <span id="loja-status" class="text-[10px] text-yellow-300 font-medium">Verificando horário...</span>
+                    <div id="loja-status" class="text-[10px] text-yellow-300 font-medium">Aberto agora • Patos/PB</div>
                 </div>
             </div>
-            <button onclick="abrirCarrinho()" class="relative bg-brand-yellow text-gray-900 px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow">
+            <button onclick="abrirCarrinho()" class="bg-brand-yellow text-gray-900 px-3 py-1.5 rounded-xl font-extrabold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span id="contador-carrinho">0</span>
             </button>
         </div>
     </header>
 
-    <!-- Banner Promocional -->
-    <main class="max-w-md mx-auto p-4 space-y-4">
+    <!-- Conteudo Principal -->
+    <main class="max-w-md mx-auto px-4 pt-4 space-y-4">
+        
+        <!-- Banner Promocional -->
         <div class="bg-gradient-to-r from-brand-green to-brand-darkGreen text-white p-4 rounded-2xl shadow-sm relative overflow-hidden">
             <span class="bg-brand-yellow text-gray-900 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">Especial de Frutas</span>
-            <h2 class="text-lg font-black mt-1">Frutas Frescas Selecionadas</h2>
+            <h2 class="text-base font-black mt-1">Frutas Frescas Selecionadas</h2>
             <p class="text-xs text-emerald-100 mt-0.5">Use o cupom <strong class="text-brand-yellow">FRIGO10</strong> no checkout para 10% OFF!</p>
         </div>
 
@@ -51,21 +58,27 @@
         <div id="container-repetir" class="hidden">
             <button onclick="repetirUltimoPedido()" class="w-full bg-emerald-50 border border-emerald-200 text-emerald-800 p-3 rounded-xl font-bold text-xs flex items-center justify-between shadow-sm">
                 <span class="flex items-center gap-2"><i class="fa-solid fa-rotate-right text-brand-green"></i> Repetir Último Pedido</span>
-                <span class="text-[10px] bg-emerald-200 px-2 py-0.5 rounded-full">Rápido</span>
+                <span class="text-[10px] bg-emerald-200 px-2 py-0.5 rounded-full font-extrabold">Rápido</span>
             </button>
         </div>
 
-        <!-- Barra de Pesquisa -->
+        <!-- Campo de Pesquisa -->
         <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-gray-400 text-sm"></i>
-            <input type="text" id="input-busca" oninput="filtrarProdutos()" placeholder="Buscar fruta desejada..." class="w-full bg-white pl-10 pr-4 py-3 rounded-xl text-xs border border-gray-200 focus:outline-none focus:border-brand-green shadow-sm">
+            <input type="text" id="input-busca" oninput="filtrarProdutos()" placeholder="Buscar fruta desejada..." class="w-full bg-white pl-10 pr-4 py-2.5 rounded-xl text-xs border border-gray-200 focus:outline-none focus:border-brand-green shadow-sm">
+        </div>
+
+        <!-- Filtros por Categoria / Tag (Restaurados) -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            <button onclick="filtrarCategoria('todas')" id="btn-cat-todas" class="bg-brand-green text-white font-bold px-3.5 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm">Todas as Frutas</button>
+            <button onclick="filtrarCategoria('ofertas')" id="btn-cat-ofertas" class="bg-white border border-gray-200 text-gray-700 font-bold px-3.5 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm flex items-center gap-1"><i class="fa-solid fa-fire text-orange-500"></i> Ofertas</button>
         </div>
 
         <!-- Grid de Produtos -->
-        <div id="grid-produtos" class="grid grid-cols-2 gap-3">
-            <!-- Carregado via Supabase -->
-            <div class="col-span-2 text-center py-10 text-gray-400 text-xs">A carregar produtos frescos...</div>
+        <div id="grid-produtos" class="grid grid-cols-2 gap-3 pt-1">
+            <div class="col-span-2 text-center py-10 text-gray-400 text-xs">Carregando catálogo do Supabase...</div>
         </div>
+
     </main>
 
     <!-- Modal do Carrinho -->
@@ -73,17 +86,15 @@
         <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 bg-gray-50 border-b flex items-center justify-between">
                 <h3 class="font-bold text-sm text-gray-900"><i class="fa-solid fa-bag-shopping text-brand-green mr-1"></i> Seu Carrinho</h3>
-                <button onclick="fecharCarrinho()" class="text-gray-400 hover:text-gray-600 text-lg px-2">&times;</button>
+                <button onclick="fecharCarrinho()" class="text-gray-400 hover:text-gray-600 text-xl font-bold px-2">&times;</button>
             </div>
             
-            <div id="lista-carrinho" class="p-4 overflow-y-auto flex-1 space-y-3 divide-y divide-gray-100">
-                <!-- Itens -->
-            </div>
+            <div id="lista-carrinho" class="p-4 overflow-y-auto flex-1 space-y-3 divide-y divide-gray-100"></div>
 
             <div class="p-4 bg-gray-50 border-t space-y-3">
-                <!-- Seletor de Bairro -->
+                <!-- Seletor de Bairro em Patos -->
                 <div>
-                    <label class="block text-[11px] font-bold text-gray-700 mb-1">Selecione o Bairro em Patos/PB:</label>
+                    <label class="block text-[11px] font-bold text-gray-700 mb-1">Bairro para entrega em Patos/PB:</label>
                     <select id="select-bairro" onchange="atualizarTotais()" class="w-full bg-white border border-gray-200 rounded-xl p-2.5 text-xs font-medium text-gray-800 focus:outline-none focus:border-brand-green">
                         <option value="5.00">Centro (R$ 5,00)</option>
                         <option value="7.00">Belo Horizonte (R$ 7,00)</option>
@@ -114,7 +125,7 @@
         </div>
     </div>
 
-    <!-- Supabase CDN -->
+    <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://cfihhckmgqbnkpyfujam.supabase.co';
@@ -124,11 +135,10 @@
         let produtosGlobais = [];
         let carrinho = [];
         let descontoAplicado = 0;
+        let filtroAtual = 'todas';
 
-        // Verificar Horário de Funcionamento (07:00 às 19:00)
         function verificarStatusLoja() {
-            const agora = new Date();
-            const hora = agora.getHours();
+            const hora = new Date().getHours();
             const statusEl = document.getElementById('loja-status');
             if (hora >= 7 && hora < 19) {
                 statusEl.innerHTML = '<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 mr-1 animate-pulse"></span> Aberto agora • Patos/PB';
@@ -138,7 +148,7 @@
         }
 
         async function carregarProdutos() {
-            const { data, error } = await supabaseClient.from('produtos').select('*').eq('disponivel', true);
+            const { data, error } = await supabaseClient.from('produtos').select('*').eq('disponivel', true).order('id', { ascending: true });
             if (!error && data) {
                 produtosGlobais = data;
                 renderizarProdutos(produtosGlobais);
@@ -147,6 +157,10 @@
 
         function renderizarProdutos(lista) {
             const container = document.getElementById('grid-produtos');
+            if (lista.length === 0) {
+                container.innerHTML = '<div class="col-span-2 text-center py-8 text-gray-400 text-xs">Nenhuma fruta encontrada.</div>';
+                return;
+            }
             container.innerHTML = lista.map(p => `
                 <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between">
                     <div>
@@ -154,13 +168,14 @@
                             <img src="${p.imagem}" class="w-full h-28 object-cover rounded-xl">
                             ${p.em_oferta ? '<span class="absolute top-1.5 left-1.5 bg-red-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase">Oferta</span>' : ''}
                         </div>
+                        <span class="text-[10px] text-gray-400 uppercase font-semibold tracking-wider">FRUTAS</span>
                         <h4 class="font-bold text-gray-900 text-xs mb-1 line-clamp-1">${p.nome}</h4>
                         <div class="flex items-baseline gap-1.5 mb-2">
                             <span class="text-sm font-black text-emerald-700">R$ ${Number(p.em_oferta ? p.preco_oferta : p.preco).toFixed(2)}</span>
-                            ${p.em_oferta ? `<span class="text-[10px] text-gray-400 line-through">R$ ${Number(p.preco).toFixed(2)}</span>` : ''}
+                            ${p.em_oferta && p.preco ? `<span class="text-[10px] text-gray-400 line-through">R$ ${Number(p.preco).toFixed(2)}</span>` : ''}
                         </div>
                     </div>
-                    <button onclick="adicionarCarrinho(${p.id})" class="w-full bg-brand-green text-white font-bold py-2 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow-sm">
+                    <button onclick="adicionarCarrinho(${p.id})" class="w-full bg-brand-green hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow-sm transition">
                         <i class="fa-solid fa-plus text-[10px]"></i> Adicionar
                     </button>
                 </div>
@@ -169,8 +184,26 @@
 
         function filtrarProdutos() {
             const termo = document.getElementById('input-busca').value.toLowerCase();
-            const filtrados = produtosGlobais.filter(p => p.nome.toLowerCase().includes(termo));
-            renderizarProdutos(filtrados);
+            let lista = produtosGlobais.filter(p => p.nome.toLowerCase().includes(termo));
+            if (filtroAtual === 'ofertas') {
+                lista = lista.filter(p => p.em_oferta);
+            }
+            renderizarProdutos(lista);
+        }
+
+        function filtrarCategoria(cat) {
+            filtroAtual = cat;
+            const btnTodas = document.getElementById('btn-cat-todas');
+            const btnOfertas = document.getElementById('btn-cat-ofertas');
+
+            if (cat === 'todas') {
+                btnTodas.className = 'bg-brand-green text-white font-bold px-3.5 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm';
+                btnOfertas.className = 'bg-white border border-gray-200 text-gray-700 font-bold px-3.5 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm flex items-center gap-1';
+            } else {
+                btnOfertas.className = 'bg-brand-green text-white font-bold px-3.5 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm flex items-center gap-1';
+                btnTodas.className = 'bg-white border border-gray-200 text-gray-700 font-bold px-3.5 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm';
+            }
+            filtrarProdutos();
         }
 
         function adicionarCarrinho(id) {
@@ -259,7 +292,6 @@
             const subtotal = carrinho.reduce((sum, i) => sum + (i.preco * i.qtd), 0);
             const total = Math.max(0, subtotal - descontoAplicado) + frete;
 
-            // Guardar ultimo pedido no localStorage
             localStorage.setItem('frigo_ultimo_pedido', JSON.stringify(carrinho));
 
             let texto = `🛒 *NOVO PEDIDO - FRIGO FRUTAS*\n\n`;
