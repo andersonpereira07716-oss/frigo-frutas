@@ -27,9 +27,9 @@ jobs:
       - name: Install Bubblewrap CLI
         run: npm install -g @bubblewrap/cli
 
-      - name: Initialize Bubblewrap TWA Project
+      - name: Initialize Bubblewrap TWA Non-Interactive
         run: |
-          bubblewrap init --manifest="https://frigo-frutas.vercel.app/manifest.json" --directory="twa-app"
+          bubblewrap init --manifest="https://frigo-frutas.vercel.app/manifest.json" --directory="twa-app" --skip-sdk-checks --path-to-jdk="/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.20-1/x64" --path-to-android-sdk=""
 
       - name: Build Android APK
         run: |
