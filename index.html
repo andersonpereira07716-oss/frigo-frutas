@@ -12,9 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#00875A">
-    
     <link rel="preconnect" href="https://images.unsplash.com">
-    
     <script>
       tailwind.config = {
         theme: {
@@ -47,8 +45,8 @@
         </div>
     </header>
 
-    <!-- Conteudo Principal -->
-    <main class="max-w-md mx-auto px-4 pt-3 space-y-3">
+    <!-- Conteudo Principal da Loja -->
+    <main id="view-loja" class="max-w-md mx-auto px-4 pt-3 space-y-3">
         
         <!-- Banner Promocional -->
         <div class="bg-gradient-to-r from-brand-green to-brand-darkGreen text-white p-3.5 rounded-2xl shadow-sm relative overflow-hidden">
@@ -80,15 +78,60 @@
         <!-- Grid de Produtos -->
         <div id="grid-produtos" class="grid grid-cols-2 gap-3 pt-1"></div>
 
-        <!-- Rodape com Atalho para Area do Dono -->
+        <!-- Rodape com Botao Seguro para o Dono -->
         <footer class="pt-8 pb-4 text-center text-xs text-gray-400 space-y-2">
             <p>© Frigo Frutas • Patos - PB</p>
-            <a href="/admin" class="inline-flex items-center gap-1 text-[11px] text-gray-400 hover:text-brand-green underline transition">
+            <button onclick="abrirModalAdmin()" class="inline-flex items-center gap-1 text-[11px] text-gray-500 hover:text-brand-green underline transition">
                 <i class="fa-solid fa-lock text-[10px]"></i> Área do Administrador
-            </a>
+            </button>
         </footer>
-
     </main>
+
+    <!-- Painel Administrativo (Oculto por Padrao) -->
+    <div id="view-admin" class="max-w-md mx-auto px-4 pt-6 space-y-4 hidden">
+        <!-- Tela de Login Admin -->
+        <div id="admin-login-box" class="bg-white p-6 rounded-3xl shadow-sm border border-gray-200 text-center space-y-4">
+            <div class="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto text-brand-green text-lg font-black">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <div>
+                <h3 class="font-extrabold text-sm text-gray-900">Acesso Restrito ao Dono</h3>
+                <p class="text-[11px] text-gray-500">Insira as credenciais para gerenciar a loja</p>
+            </div>
+            <form onsubmit="fazerLoginAdmin(event)" class="space-y-3 text-left">
+                <input type="email" id="adm-email" required placeholder="E-mail" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-xs">
+                <input type="password" id="adm-senha" required placeholder="Senha" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-xs">
+                <button type="submit" class="w-full bg-brand-green text-white font-bold py-2.5 rounded-xl text-xs shadow">Entrar no Painel</button>
+            </form>
+            <button onclick="fecharAdmin()" class="text-xs text-gray-400 underline">Voltar para a Loja</button>
+        </div>
+
+        <!-- Painel de Gestao (Aparece apos login) -->
+        <div id="admin-dashboard" class="space-y-4 hidden">
+            <div class="flex items-center justify-between bg-emerald-800 text-white p-3 rounded-2xl shadow">
+                <span class="font-bold text-xs"><i class="fa-solid fa-boxes-stacked mr-1"></i> Gestão Frigo Frutas</span>
+                <button onclick="fazerLogoutAdmin()" class="bg-red-600 px-2.5 py-1 rounded-xl text-[10px] font-bold">Sair</button>
+            </div>
+
+            <!-- Adicionar Produto -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 space-y-3">
+                <h4 class="font-bold text-xs text-gray-900">Cadastrar Nova Fruta</h4>
+                <form onsubmit="cadastrarProduto(event)" class="space-y-2">
+                    <input type="text" id="novo-nome" placeholder="Nome (ex: Manga Rosa)" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2 text-xs">
+                    <input type="number" step="0.01" id="novo-preco" placeholder="Preço (R$)" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2 text-xs">
+                    <input type="text" id="novo-imagem" placeholder="URL da Imagem (https://...)" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2 text-xs">
+                    <button type="submit" class="w-full bg-brand-green text-white font-bold py-2 rounded-xl text-xs">Salvar Produto</button>
+                </form>
+            </div>
+
+            <!-- Lista de Gestao -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 space-y-3">
+                <h4 class="font-bold text-xs text-gray-900">Produtos no Banco</h4>
+                <div id="lista-admin-produtos" class="space-y-2 max-h-60 overflow-y-auto"></div>
+            </div>
+            <button onclick="fecharAdmin()" class="w-full bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl text-xs">Voltar à Loja</button>
+        </div>
+    </div>
 
     <!-- Modal do Carrinho -->
     <div id="modal-carrinho" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -101,10 +144,9 @@
             <div id="lista-carrinho" class="p-4 overflow-y-auto flex-1 space-y-3 divide-y divide-gray-100"></div>
 
             <div class="p-4 bg-gray-50 border-t space-y-3 overflow-y-auto max-h-[60vh]">
-                <!-- Seletor de Bairro -->
                 <div>
                     <label class="block text-[11px] font-bold text-gray-700 mb-1">Bairro para entrega em Patos/PB:</label>
-                    <select id="select-bairro" onchange="atualizarTotais()" class="w-full bg-white border border-gray-200 rounded-xl p-2.5 text-xs font-medium text-gray-800 focus:outline-none focus:border-brand-green">
+                    <select id="select-bairro" onchange="atualizarTotais()" class="w-full bg-white border border-gray-200 rounded-xl p-2.5 text-xs font-medium">
                         <option value="5.00">Centro (R$ 5,00)</option>
                         <option value="7.00">Belo Horizonte (R$ 7,00)</option>
                         <option value="7.00">Brasília (R$ 7,00)</option>
@@ -113,47 +155,41 @@
                     </select>
                 </div>
 
-                <!-- Forma de Pagamento -->
                 <div>
                     <label class="block text-[11px] font-bold text-gray-700 mb-1">Forma de Pagamento:</label>
-                    <select id="select-pagamento" onchange="alterarFormaPagamento()" class="w-full bg-white border border-gray-200 rounded-xl p-2.5 text-xs font-medium text-gray-800 focus:outline-none focus:border-brand-green">
+                    <select id="select-pagamento" onchange="alterarFormaPagamento()" class="w-full bg-white border border-gray-200 rounded-xl p-2.5 text-xs font-medium">
                         <option value="pix">Pix (Chave da loja)</option>
                         <option value="cartao_maquininha">Cartão de Crédito / Débito (Na entrega)</option>
                         <option value="dinheiro">Dinheiro (Em espécie)</option>
                     </select>
                 </div>
 
-                <!-- Painel Informativo PIX -->
                 <div id="box-pix" class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs space-y-2">
                     <div class="flex items-center justify-between text-emerald-900 font-bold">
                         <span><i class="fa-solid fa-pix text-emerald-600"></i> Chave Pix (Telefone):</span>
-                        <button onclick="copiarChavePix()" class="text-[10px] bg-brand-green text-white px-2 py-1 rounded-lg font-extrabold hover:bg-emerald-700">Copiar Chave</button>
+                        <button onclick="copiarChavePix()" class="text-[10px] bg-brand-green text-white px-2 py-1 rounded-lg font-extrabold">Copiar Chave</button>
                     </div>
-                    <p id="chave-pix-val" class="font-mono text-gray-800 font-bold bg-white p-1.5 rounded border border-emerald-100 text-center">83998765554</p>
-                    <p class="text-[10px] text-emerald-700 italic">Pague via Pix e envie o comprovante diretamente no WhatsApp ao clicar no botão abaixo.</p>
+                    <p id="chave-pix-val" class="font-mono text-gray-800 font-bold bg-white p-1.5 rounded border text-center">83998765554</p>
                 </div>
 
-                <!-- Campo Troco se for Dinheiro -->
                 <div id="box-troco" class="hidden">
                     <label class="block text-[11px] font-bold text-gray-700 mb-1">Troco para quanto?</label>
-                    <input type="text" id="input-troco" placeholder="Ex: R$ 50,00 ou Não preciso" class="w-full bg-white border border-gray-200 rounded-xl p-2 text-xs font-medium">
+                    <input type="text" id="input-troco" placeholder="Ex: R$ 50,00" class="w-full bg-white border border-gray-200 rounded-xl p-2 text-xs">
                 </div>
 
-                <!-- Cupom -->
                 <div class="flex gap-2">
                     <input type="text" id="input-cupom" placeholder="Cupom (ex: FRIGO10)" class="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs uppercase font-bold">
                     <button onclick="aplicarCupom()" class="bg-gray-800 text-white px-4 py-2 rounded-xl text-xs font-bold">Aplicar</button>
                 </div>
 
-                <!-- Totais -->
                 <div class="space-y-1 text-xs text-gray-600 pt-2 border-t">
                     <div class="flex justify-between"><span>Subtotal:</span> <span id="val-subtotal">R$ 0,00</span></div>
                     <div class="flex justify-between"><span>Taxa de Entrega:</span> <span id="val-frete">R$ 5,00</span></div>
-                    <div id="linha-desconto" class="flex justify-between text-emerald-600 font-bold hidden"><span>Desconto (FRIGO10):</span> <span id="val-desconto">-R$ 0,00</span></div>
+                    <div id="linha-desconto" class="flex justify-between text-emerald-600 font-bold hidden"><span>Desconto:</span> <span id="val-desconto">-R$ 0,00</span></div>
                     <div class="flex justify-between text-sm font-black text-gray-900 pt-1 border-t"><span>Total:</span> <span id="val-total" class="text-brand-green">R$ 0,00</span></div>
                 </div>
 
-                <button id="btn-enviar-ped" onclick="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs shadow-md flex items-center justify-center gap-2 transition active:scale-95">
+                <button onclick="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs shadow-md flex items-center justify-center gap-2">
                     <i class="fa-brands fa-whatsapp text-base"></i> Enviar Pedido via WhatsApp
                 </button>
             </div>
@@ -185,7 +221,7 @@
             if (hora >= 7 && hora < 19) {
                 statusEl.innerHTML = '<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 mr-1 animate-pulse"></span> Aberto agora • Patos/PB';
             } else {
-                statusEl.innerHTML = '<span class="inline-block w-2 h-2 rounded-full bg-red-400 mr-1"></span> Fechado no momento ( Abre às 07:00 )';
+                statusEl.innerHTML = '<span class="inline-block w-2 h-2 rounded-full bg-red-400 mr-1"></span> Fechado no momento';
             }
         }
 
@@ -196,9 +232,7 @@
                     produtosGlobais = data;
                     renderizarProdutos(produtosGlobais);
                 }
-            } catch (e) {
-                console.log('Usando catálogo local.');
-            }
+            } catch (e) {}
         }
 
         function renderizarProdutos(lista) {
@@ -211,17 +245,17 @@
                 <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between">
                     <div>
                         <div class="relative mb-2 bg-gray-100 rounded-xl overflow-hidden min-h-[112px]">
-                            <img src="${p.imagem}" loading="eager" decoding="async" class="w-full h-28 object-cover rounded-xl transition duration-300">
-                            ${p.em_oferta ? '<span class="absolute top-1.5 left-1.5 bg-red-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider">Oferta</span>' : ''}
+                            <img src="${p.imagem}" loading="eager" decoding="async" class="w-full h-28 object-cover rounded-xl">
+                            ${p.em_oferta ? '<span class="absolute top-1.5 left-1.5 bg-red-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase">Oferta</span>' : ''}
                         </div>
-                        <span class="text-[10px] text-gray-400 uppercase font-semibold tracking-wider">FRUTAS</span>
+                        <span class="text-[10px] text-gray-400 uppercase font-semibold">FRUTAS</span>
                         <h4 class="font-bold text-gray-900 text-xs mb-1 line-clamp-1">${p.nome}</h4>
                         <div class="flex items-baseline gap-1.5 mb-2">
                             <span class="text-sm font-black text-emerald-700">R$ ${Number(p.em_oferta ? p.preco_oferta : p.preco).toFixed(2)}</span>
                             ${p.em_oferta && p.preco ? `<span class="text-[10px] text-gray-400 line-through">R$ ${Number(p.preco).toFixed(2)}</span>` : ''}
                         </div>
                     </div>
-                    <button onclick="adicionarCarrinho(${p.id})" class="w-full bg-brand-green hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow-sm transition active:scale-95">
+                    <button onclick="adicionarCarrinho(${p.id})" class="w-full bg-brand-green hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow-sm">
                         <i class="fa-solid fa-plus text-[10px]"></i> Adicionar
                     </button>
                 </div>
@@ -231,9 +265,7 @@
         function filtrarProdutos() {
             const termo = document.getElementById('input-busca').value.toLowerCase();
             let lista = produtosGlobais.filter(p => p.nome.toLowerCase().includes(termo));
-            if (filtroAtual === 'ofertas') {
-                lista = lista.filter(p => p.em_oferta);
-            }
+            if (filtroAtual === 'ofertas') lista = lista.filter(p => p.em_oferta);
             renderizarProdutos(lista);
         }
 
@@ -241,7 +273,6 @@
             filtroAtual = cat;
             const btnTodas = document.getElementById('btn-cat-todas');
             const btnOfertas = document.getElementById('btn-cat-ofertas');
-
             if (cat === 'todas') {
                 btnTodas.className = 'bg-brand-green text-white font-bold px-3.5 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm';
                 btnOfertas.className = 'bg-white border border-gray-200 text-gray-700 font-bold px-3.5 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm flex items-center gap-1';
@@ -256,18 +287,13 @@
             const produto = produtosGlobais.find(p => p.id === id);
             const itemExistente = carrinho.find(i => i.id === id);
             const precoFinal = produto.em_oferta ? produto.preco_oferta : produto.preco;
-
-            if (itemExistente) {
-                itemExistente.qtd++;
-            } else {
-                carrinho.push({ id: produto.id, nome: produto.nome, preco: precoFinal, qtd: 1 });
-            }
+            if (itemExistente) itemExistente.qtd++;
+            else carrinho.push({ id: produto.id, nome: produto.nome, preco: precoFinal, qtd: 1 });
             atualizarContador();
         }
 
         function atualizarContador() {
-            const totalQtd = carrinho.reduce((sum, i) => sum + i.qtd, 0);
-            document.getElementById('contador-carrinho').innerText = totalQtd;
+            document.getElementById('contador-carrinho').innerText = carrinho.reduce((sum, i) => sum + i.qtd, 0);
         }
 
         function abrirCarrinho() {
@@ -282,9 +308,9 @@
                             <p class="text-gray-500 text-[10px]">R$ ${Number(i.preco).toFixed(2)} un</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button onclick="mudarQtd(${index}, -1)" class="w-6 h-6 bg-gray-100 rounded-lg font-bold text-gray-600">-</button>
+                            <button onclick="mudarQtd(${index}, -1)" class="w-6 h-6 bg-gray-100 rounded-lg font-bold">-</button>
                             <span class="font-bold text-xs">${i.qtd}</span>
-                            <button onclick="mudarQtd(${index}, 1)" class="w-6 h-6 bg-gray-100 rounded-lg font-bold text-gray-600">+</button>
+                            <button onclick="mudarQtd(${index}, 1)" class="w-6 h-6 bg-gray-100 rounded-lg font-bold">+</button>
                         </div>
                     </div>
                 `).join('');
@@ -294,9 +320,7 @@
             document.getElementById('modal-carrinho').classList.remove('hidden');
         }
 
-        function fecharCarrinho() {
-            document.getElementById('modal-carrinho').classList.add('hidden');
-        }
+        function fecharCarrinho() { document.getElementById('modal-carrinho').classList.add('hidden'); }
 
         function mudarQtd(index, delta) {
             carrinho[index].qtd += delta;
@@ -307,35 +331,22 @@
 
         function alterarFormaPagamento() {
             const tipo = document.getElementById('select-pagamento').value;
-            const boxPix = document.getElementById('box-pix');
-            const boxTroco = document.getElementById('box-troco');
-
-            if (tipo === 'pix') {
-                boxPix.classList.remove('hidden');
-                boxTroco.classList.add('hidden');
-            } else if (tipo === 'dinheiro') {
-                boxPix.classList.add('hidden');
-                boxTroco.classList.remove('hidden');
-            } else {
-                boxPix.classList.add('hidden');
-                boxTroco.classList.add('hidden');
-            }
+            document.getElementById('box-pix').classList.toggle('hidden', tipo !== 'pix');
+            document.getElementById('box-troco').classList.toggle('hidden', tipo !== 'dinheiro');
         }
 
         function copiarChavePix() {
-            const chave = document.getElementById('chave-pix-val').innerText;
-            navigator.clipboard.writeText(chave);
-            alert('Chave Pix copiada com sucesso!');
+            navigator.clipboard.writeText(document.getElementById('chave-pix-val').innerText);
+            alert('Chave Pix copiada!');
         }
 
         function aplicarCupom() {
-            const codigo = document.getElementById('input-cupom').value.trim().toUpperCase();
             const subtotal = carrinho.reduce((sum, i) => sum + (i.preco * i.qtd), 0);
-            if (codigo === 'FRIGO10') {
+            if (document.getElementById('input-cupom').value.trim().toUpperCase() === 'FRIGO10') {
                 descontoAplicado = subtotal * 0.10;
                 document.getElementById('linha-desconto').classList.remove('hidden');
                 document.getElementById('val-desconto').innerText = `-R$ ${descontoAplicado.toFixed(2)}`;
-                alert('Cupom FRIGO10 aplicado com sucesso (10% OFF)!');
+                alert('Cupom aplicado!');
             } else {
                 descontoAplicado = 0;
                 document.getElementById('linha-desconto').classList.add('hidden');
@@ -348,63 +359,87 @@
             const subtotal = carrinho.reduce((sum, i) => sum + (i.preco * i.qtd), 0);
             const frete = parseFloat(document.getElementById('select-bairro').value);
             const total = Math.max(0, subtotal - descontoAplicado) + frete;
-
             document.getElementById('val-subtotal').innerText = `R$ ${subtotal.toFixed(2)}`;
             document.getElementById('val-frete').innerText = `R$ ${frete.toFixed(2)}`;
             document.getElementById('val-total').innerText = `R$ ${total.toFixed(2)}`;
         }
 
         function enviarPedidoWhatsApp() {
-            if (carrinho.length === 0) return alert('Adicione itens ao carrinho.');
-            
-            const formaPag = document.getElementById('select-pagamento').value;
-            const bairroSelect = document.getElementById('select-bairro');
-            const nomeBairro = bairroSelect.options[bairroSelect.selectedIndex].text;
-            const frete = parseFloat(bairroSelect.value);
+            if (carrinho.length === 0) return alert('Carrinho vazio.');
+            const bairro = document.getElementById('select-bairro');
             const subtotal = carrinho.reduce((sum, i) => sum + (i.preco * i.qtd), 0);
-            const total = Math.max(0, subtotal - descontoAplicado) + frete;
-
-            let textoPagamento = "";
-
-            if (formaPag === 'pix') {
-                textoPagamento = "Pix (Chave: 83998765554) - *Comprovante em anexo*";
-            } else if (formaPag === 'cartao_maquininha') {
-                textoPagamento = "Cartão de Crédito / Débito (Levar maquininha na entrega)";
-            } else if (formaPag === 'dinheiro') {
-                const troco = document.getElementById('input-troco').value || 'Não informado';
-                textoPagamento = `Dinheiro (Troco informado: ${troco})`;
-            }
-
-            localStorage.setItem('frigo_ultimo_pedido', JSON.stringify(carrinho));
-
+            const total = Math.max(0, subtotal - descontoAplicado) + parseFloat(bairro.value);
+            
             let texto = `🛒 *NOVO PEDIDO - FRIGO FRUTAS*\n\n`;
-            carrinho.forEach(i => {
-                texto += `• ${i.qtd}x ${i.nome} (R$ ${(i.preco * i.qtd).toFixed(2)})\n`;
-            });
-            texto += `\n📍 *Bairro:* ${nomeBairro}`;
-            texto += `\n💳 *Pagamento:* ${textoPagamento}`;
-            texto += `\n📦 *Subtotal:* R$ ${subtotal.toFixed(2)}`;
-            if (descontoAplicado > 0) texto += `\n🎟️ *Desconto:* -R$ ${descontoAplicado.toFixed(2)}`;
-            texto += `\n🛵 *Taxa de Entrega:* R$ ${frete.toFixed(2)}`;
-            texto += `\n💰 *TOTAL A PAGAR:* *R$ ${total.toFixed(2)}*\n\nEnviado via App Oficial Patos/PB.`;
+            carrinho.forEach(i => texto += `• ${i.qtd}x ${i.nome} (R$ ${(i.preco * i.qtd).toFixed(2)})\n`);
+            texto += `\n📍 *Bairro:* ${bairro.options[bairro.selectedIndex].text}`;
+            texto += `\n💰 *TOTAL:* *R$ ${total.toFixed(2)}*\n\nEnviado via App Patos/PB.`;
 
-            const url = `https://wa.me/5583998765554?text=${encodeURIComponent(texto)}`;
-            window.open(url, '_blank');
+            window.open(`https://wa.me/5583998765554?text=${encodeURIComponent(texto)}`, '_blank');
         }
 
-        function verificarUltimoPedido() {
-            const salvo = localStorage.getItem('frigo_ultimo_pedido');
-            if (salvo) {
-                document.getElementById('container-repetir').classList.remove('hidden');
+        // Funcoes do Painel Admin na mesma pagina
+        async function abrirModalAdmin() {
+            document.getElementById('view-loja').classList.add('hidden');
+            document.getElementById('view-admin').classList.remove('hidden');
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                document.getElementById('admin-login-box').classList.add('hidden');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                carregarProdutosAdmin();
+            } else {
+                document.getElementById('admin-login-box').classList.remove('hidden');
+                document.getElementById('admin-dashboard').classList.add('hidden');
             }
         }
 
-        function repetirUltimoPedido() {
-            const salvo = localStorage.getItem('frigo_ultimo_pedido');
-            if (salvo) {
-                carrinho = JSON.parse(salvo);
-                atualizarContador();
-                abrirCarrinho();
+        function fecharAdmin() {
+            document.getElementById('view-admin').classList.add('hidden');
+            document.getElementById('view-loja').classList.remove('hidden');
+        }
+
+        async function fazerLoginAdmin(e) {
+            e.preventDefault();
+            const email = document.getElementById('adm-email').value;
+            const password = document.getElementById('adm-senha').value;
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) alert('Erro de login: verifique e-mail e senha.');
+            else abrirModalAdmin();
+        }
+
+        async function fazerLogoutAdmin() {
+            await supabaseClient.auth.signOut();
+            abrirModalAdmin();
+        }
+
+        async function carregarProdutosAdmin() {
+            const { data } = await supabaseClient.from('produtos').select('*').order('id', { ascending: true });
+            const container = document.getElementById('lista-admin-produtos');
+            container.innerHTML = (data || []).map(p => `
+                <div class="flex items-center justify-between p-2 bg-gray-50 rounded-xl text-xs border">
+                    <span><b>${p.nome}</b> - R$ ${p.preco}</span>
+                    <button onclick="excluirProdutoAdmin(${p.id})" class="text-red-600 font-bold px-2">Excluir</button>
+                </div>
+            `).join('');
+        }
+
+        async function cadastrarProduto(e) {
+            e.preventDefault();
+            const nome = document.getElementById('novo-nome').value;
+            const preco = parseFloat(document.getElementById('novo-preco').value);
+            const imagem = document.getElementById('novo-imagem').value;
+            await supabaseClient.from('produtos').insert([{ nome, preco, imagem, categoria: 'Frutas', disponivel: true }]);
+            alert('Produto cadastrado!');
+            e.target.reset();
+            carregarProdutosAdmin();
+            sincronizarSupabase();
+        }
+
+        async function excluirProdutoAdmin(id) {
+            if (confirm('Apagar produto?')) {
+                await supabaseClient.from('produtos').delete().eq('id', id);
+                carregarProdutosAdmin();
+                sincronizarSupabase();
             }
         }
 
@@ -412,7 +447,6 @@
             verificarStatusLoja();
             renderizarProdutos(produtosGlobais);
             sincronizarSupabase();
-            verificarUltimoPedido();
         };
     </script>
 </body>
