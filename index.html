@@ -13,7 +13,6 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#00875A">
     
-    <!-- Preconnect com servidores de imagem para acelerar o carregamento -->
     <link rel="preconnect" href="https://images.unsplash.com">
     
     <script>
@@ -48,7 +47,7 @@
         </div>
     </header>
 
-    <!-- Conteudo Principal com Espacamento Superior Adequado -->
+    <!-- Conteudo Principal -->
     <main class="max-w-md mx-auto px-4 pt-3 space-y-3">
         
         <!-- Banner Promocional -->
@@ -78,14 +77,14 @@
             <button onclick="filtrarCategoria('ofertas')" id="btn-cat-ofertas" class="bg-white border border-gray-200 text-gray-700 font-bold px-3.5 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm flex items-center gap-1"><i class="fa-solid fa-fire text-orange-500"></i> Ofertas</button>
         </div>
 
-        <!-- Grid de Produtos Instantaneo -->
+        <!-- Grid de Produtos -->
         <div id="grid-produtos" class="grid grid-cols-2 gap-3 pt-1"></div>
 
     </main>
 
-    <!-- Modal do Carrinho -->
+    <!-- Modal do Carrinho Atualizado com Forma de Pagamento -->
     <div id="modal-carrinho" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 bg-gray-50 border-b flex items-center justify-between">
                 <h3 class="font-bold text-sm text-gray-900"><i class="fa-solid fa-bag-shopping text-brand-green mr-1"></i> Seu Carrinho</h3>
                 <button onclick="fecharCarrinho()" class="text-gray-400 hover:text-gray-600 text-xl font-bold px-2">&times;</button>
@@ -93,8 +92,8 @@
             
             <div id="lista-carrinho" class="p-4 overflow-y-auto flex-1 space-y-3 divide-y divide-gray-100"></div>
 
-            <div class="p-4 bg-gray-50 border-t space-y-3">
-                <!-- Seletor de Bairro em Patos -->
+            <div class="p-4 bg-gray-50 border-t space-y-3 overflow-y-auto max-h-[60vh]">
+                <!-- Seletor de Bairro -->
                 <div>
                     <label class="block text-[11px] font-bold text-gray-700 mb-1">Bairro para entrega em Patos/PB:</label>
                     <select id="select-bairro" onchange="atualizarTotais()" class="w-full bg-white border border-gray-200 rounded-xl p-2.5 text-xs font-medium text-gray-800 focus:outline-none focus:border-brand-green">
@@ -104,6 +103,32 @@
                         <option value="8.00">Mato Grosso (R$ 8,00)</option>
                         <option value="10.00">Outros Bairros / Periferia (R$ 10,00)</option>
                     </select>
+                </div>
+
+                <!-- Forma de Pagamento -->
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-700 mb-1">Forma de Pagamento:</label>
+                    <select id="select-pagamento" onchange="alterarFormaPagamento()" class="w-full bg-white border border-gray-200 rounded-xl p-2.5 text-xs font-medium text-gray-800 focus:outline-none focus:border-brand-green">
+                        <option value="pix">Pix (Chave da loja)</option>
+                        <option value="cartao_maquininha">Cartão de Crédito / Débito (Na entrega)</option>
+                        <option value="dinheiro">Dinheiro (Em espécie)</option>
+                    </select>
+                </div>
+
+                <!-- Painel Informativo PIX -->
+                <div id="box-pix" class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs space-y-2">
+                    <div class="flex items-center justify-between text-emerald-900 font-bold">
+                        <span><i class="fa-solid fa-pix text-emerald-600"></i> Chave Pix (Telefone):</span>
+                        <button onclick="copiarChavePix()" class="text-[10px] bg-brand-green text-white px-2 py-1 rounded-lg font-extrabold hover:bg-emerald-700">Copiar Chave</button>
+                    </div>
+                    <p id="chave-pix-val" class="font-mono text-gray-800 font-bold bg-white p-1.5 rounded border border-emerald-100 text-center">83998765554</p>
+                    <p class="text-[10px] text-emerald-700 italic">Pague via Pix e envie o comprovante no WhatsApp após clicar no botão abaixo.</p>
+                </div>
+
+                <!-- Campo Troco se for Dinheiro -->
+                <div id="box-troco" class="hidden">
+                    <label class="block text-[11px] font-bold text-gray-700 mb-1">Troco para quanto?</label>
+                    <input type="text" id="input-troco" placeholder="Ex: R$ 50,00 ou Não preciso" class="w-full bg-white border border-gray-200 rounded-xl p-2 text-xs font-medium">
                 </div>
 
                 <!-- Cupom -->
@@ -134,7 +159,6 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmaWhoY2ttZ3FibmtweWZ1amFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTYyNTQsImV4cCI6MjEwNzg3MjI1NH0.GTCMCrTrfa-1ISEe3eK-bxRz3-8rn_ZRJJqmJzTQDQo';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Catálogo local para exibição instantânea imediata
         let produtosGlobais = [
             { id: 1, nome: "Maçã Fuji (Kg)", categoria: "Frutas", preco: 8.99, preco_oferta: 6.99, em_oferta: true, imagem: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80" },
             { id: 2, nome: "Banana Prata (Kg)", categoria: "Frutas", preco: 5.49, preco_oferta: null, em_oferta: false, imagem: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&q=80" },
@@ -165,7 +189,7 @@
                     renderizarProdutos(produtosGlobais);
                 }
             } catch (e) {
-                console.log('Usando catálogo pré-carregado local.');
+                console.log('Usando catálogo local.');
             }
         }
 
@@ -272,6 +296,29 @@
             atualizarContador();
         }
 
+        function alterarFormaPagamento() {
+            const tipo = document.getElementById('select-pagamento').value;
+            const boxPix = document.getElementById('box-pix');
+            const boxTroco = document.getElementById('box-troco');
+
+            if (tipo === 'pix') {
+                boxPix.classList.remove('hidden');
+                boxTroco.classList.add('hidden');
+            } else if (tipo === 'dinheiro') {
+                boxPix.classList.add('hidden');
+                boxTroco.classList.remove('hidden');
+            } else {
+                boxPix.classList.add('hidden');
+                boxTroco.classList.add('hidden');
+            }
+        }
+
+        function copiarChavePix() {
+            const chave = document.getElementById('chave-pix-val').innerText;
+            navigator.clipboard.writeText(chave);
+            alert('Chave Pix copiada com sucesso!');
+        }
+
         function aplicarCupom() {
             const codigo = document.getElementById('input-cupom').value.trim().toUpperCase();
             const subtotal = carrinho.reduce((sum, i) => sum + (i.preco * i.qtd), 0);
@@ -306,6 +353,18 @@
             const subtotal = carrinho.reduce((sum, i) => sum + (i.preco * i.qtd), 0);
             const total = Math.max(0, subtotal - descontoAplicado) + frete;
 
+            const formaPag = document.getElementById('select-pagamento').value;
+            let textoPagamento = "";
+
+            if (formaPag === 'pix') {
+                textoPagamento = "Pix (Chave: 83998765554) - *Comprovante em anexo*";
+            } else if (formaPag === 'cartao_maquininha') {
+                textoPagamento = "Cartão de Crédito / Débito (Levar maquininha na entrega)";
+            } else if (formaPag === 'dinheiro') {
+                const troco = document.getElementById('input-troco').value || 'Não informado';
+                textoPagamento = `Dinheiro (Troco informado: ${troco})`;
+            }
+
             localStorage.setItem('frigo_ultimo_pedido', JSON.stringify(carrinho));
 
             let texto = `🛒 *NOVO PEDIDO - FRIGO FRUTAS*\n\n`;
@@ -313,6 +372,7 @@
                 texto += `• ${i.qtd}x ${i.nome} (R$ ${(i.preco * i.qtd).toFixed(2)})\n`;
             });
             texto += `\n📍 *Bairro:* ${nomeBairro}`;
+            texto += `\n💳 *Pagamento:* ${textoPagamento}`;
             texto += `\n📦 *Subtotal:* R$ ${subtotal.toFixed(2)}`;
             if (descontoAplicado > 0) texto += `\n🎟️ *Desconto:* -R$ ${descontoAplicado.toFixed(2)}`;
             texto += `\n🛵 *Taxa de Entrega:* R$ ${frete.toFixed(2)}`;
@@ -340,8 +400,8 @@
 
         window.onload = () => {
             verificarStatusLoja();
-            renderizarProdutos(produtosGlobais); // Renderiza INSTANTANEAMENTE ao abrir
-            sincronizarSupabase();               // Sincroniza em segundo plano
+            renderizarProdutos(produtosGlobais);
+            sincronizarSupabase();
             verificarUltimoPedido();
         };
     </script>
