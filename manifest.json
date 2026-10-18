@@ -1,20 +1,21 @@
 {
-  "name": "Frigo Frutas & Cia",
+  "name": "Frigo Frutas",
   "short_name": "Frigo Frutas",
+  "description": "Frutas Frescas e Selecionadas em Patos/PB",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#16a34a",
-  "theme_color": "#16a34a",
   "orientation": "portrait",
+  "background_color": "#00875A",
+  "theme_color": "#00875A",
   "icons": [
     {
-      "src": "/logo.jpg",
+      "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/1625/1625048.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
