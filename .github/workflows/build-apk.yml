@@ -11,19 +11,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
         with:
-          node-version: 18
+          distribution: 'temurin'
+          java-version: '17'
 
-      - name: Generate Android APK
+      - name: Install Bubblewrap and generate project
         run: |
-          npx pwa2apk --url "https://frigo-frutas.vercel.app" --name "Frigo Frutas" --output ./output
+          npm install -g @bubblewrap/cli
+          yes | bubblewrap init --manifest="https://frigo-frutas.vercel.app/manifest.json" --directory="android-app" || true
+
+      - name: Build APK with Gradle
+        run: |
+          cd android-app
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: FrigoFrutas-APK
-          path: output/*.apk
+          path: android-app/app/build/outputs/apk/debug/*.apk
