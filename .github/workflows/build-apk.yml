@@ -13,14 +13,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Generate Android APK via PWABuilder
-        uses: pwa-builder/pwa-action@v1.0.2
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          manifest-url: 'https://frigo-frutas.vercel.app/manifest.json'
-          signing-key-file: ''
+          node-version: 18
+
+      - name: Install PWABuilder CLI
+        run: npm install -g @pwabuilder/cli
+
+      - name: Package PWA to Android
+        run: |
+          pwabuilder package -m https://frigo-frutas.vercel.app/manifest.json -p android -o ./output
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: FrigoFrutas-APK
-          path: './*.apk'
+          path: output/*.apk
