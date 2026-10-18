@@ -18,12 +18,12 @@ jobs:
         with:
           node-version: 18
 
-      - name: Package PWA to Android APK
+      - name: Generate Android APK
         run: |
-          npx @pwabuilder/cli package -m https://frigo-frutas.vercel.app/manifest.json -p android -o ./output
+          npx pwa2apk --url "https://frigo-frutas.vercel.app" --name "Frigo Frutas" --output ./output
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: FrigoFrutas-APK
-          path: output/*
+          path: output/*.apk
