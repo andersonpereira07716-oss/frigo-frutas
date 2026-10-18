@@ -82,7 +82,7 @@
 
     </main>
 
-    <!-- Modal do Carrinho Atualizado com Forma de Pagamento -->
+    <!-- Modal do Carrinho com Trava de Pagamento Pix -->
     <div id="modal-carrinho" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 bg-gray-50 border-b flex items-center justify-between">
@@ -115,14 +115,20 @@
                     </select>
                 </div>
 
-                <!-- Painel Informativo PIX -->
+                <!-- Painel Informativo PIX com Checkbox de Seguranca -->
                 <div id="box-pix" class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs space-y-2">
                     <div class="flex items-center justify-between text-emerald-900 font-bold">
                         <span><i class="fa-solid fa-pix text-emerald-600"></i> Chave Pix (Telefone):</span>
                         <button onclick="copiarChavePix()" class="text-[10px] bg-brand-green text-white px-2 py-1 rounded-lg font-extrabold hover:bg-emerald-700">Copiar Chave</button>
                     </div>
                     <p id="chave-pix-val" class="font-mono text-gray-800 font-bold bg-white p-1.5 rounded border border-emerald-100 text-center">83998765554</p>
-                    <p class="text-[10px] text-emerald-700 italic">Pague via Pix e envie o comprovante no WhatsApp após clicar no botão abaixo.</p>
+                    
+                    <div class="pt-2 border-t border-emerald-200/60">
+                        <label class="flex items-start gap-2 cursor-pointer">
+                            <input type="checkbox" id="check-pix-pago" onchange="validarTravaPix()" class="mt-0.5 rounded text-brand-green focus:ring-brand-green">
+                            <span class="text-[11px] font-bold text-emerald-950">Realizei o pagamento Pix e anexo o comprovante ao enviar no WhatsApp.</span>
+                        </label>
+                    </div>
                 </div>
 
                 <!-- Campo Troco se for Dinheiro -->
@@ -145,7 +151,7 @@
                     <div class="flex justify-between text-sm font-black text-gray-900 pt-1 border-t"><span>Total:</span> <span id="val-total" class="text-brand-green">R$ 0,00</span></div>
                 </div>
 
-                <button onclick="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs shadow-md flex items-center justify-center gap-2">
+                <button id="btn-enviar-ped" onclick="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs shadow-md flex items-center justify-center gap-2 transition opacity-50 cursor-not-allowed">
                     <i class="fa-brands fa-whatsapp text-base"></i> Enviar Pedido via WhatsApp
                 </button>
             </div>
@@ -282,6 +288,7 @@
                 `).join('');
             }
             atualizarTotais();
+            alterarFormaPagamento();
             document.getElementById('modal-carrinho').classList.remove('hidden');
         }
 
@@ -310,6 +317,26 @@
             } else {
                 boxPix.classList.add('hidden');
                 boxTroco.classList.add('hidden');
+            }
+            validarTravaPix();
+        }
+
+        function validarTravaPix() {
+            const tipo = document.getElementById('select-pagamento').value;
+            const checkPix = document.getElementById('check-pix-pago');
+            const btn = document.getElementById('btn-enviar-ped');
+
+            if (tipo === 'pix') {
+                if (checkPix.checked) {
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    btn.disabled = false;
+                } else {
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                    btn.disabled = true;
+                }
+            } else {
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                btn.disabled = false;
             }
         }
 
@@ -347,17 +374,24 @@
 
         function enviarPedidoWhatsApp() {
             if (carrinho.length === 0) return alert('Adicione itens ao carrinho.');
+            
+            const formaPag = document.getElementById('select-pagamento').value;
+            const checkPix = document.getElementById('check-pix-pago');
+
+            if (formaPag === 'pix' && !checkPix.checked) {
+                return alert('Por favor, confirme que realizou o Pix antes de enviar o pedido.');
+            }
+
             const bairroSelect = document.getElementById('select-bairro');
             const nomeBairro = bairroSelect.options[bairroSelect.selectedIndex].text;
             const frete = parseFloat(bairroSelect.value);
             const subtotal = carrinho.reduce((sum, i) => sum + (i.preco * i.qtd), 0);
             const total = Math.max(0, subtotal - descontoAplicado) + frete;
 
-            const formaPag = document.getElementById('select-pagamento').value;
             let textoPagamento = "";
 
             if (formaPag === 'pix') {
-                textoPagamento = "Pix (Chave: 83998765554) - *Comprovante em anexo*";
+                textoPagamento = "Pix Realizado (Chave: 83998765554) - *Comprovante Anexo na Conversa*";
             } else if (formaPag === 'cartao_maquininha') {
                 textoPagamento = "Cartão de Crédito / Débito (Levar maquininha na entrega)";
             } else if (formaPag === 'dinheiro') {
@@ -376,7 +410,7 @@
             texto += `\n📦 *Subtotal:* R$ ${subtotal.toFixed(2)}`;
             if (descontoAplicado > 0) texto += `\n🎟️ *Desconto:* -R$ ${descontoAplicado.toFixed(2)}`;
             texto += `\n🛵 *Taxa de Entrega:* R$ ${frete.toFixed(2)}`;
-            texto += `\n💰 *TOTAL A PAGAR:* *R$ ${total.toFixed(2)}*\n\nEnviado via App Oficial Patos/PB.`;
+            texto += `\n💰 *TOTAL A PAGAR:* *R$ ${total.toFixed(2)}*\n\n⚠️ *Aviso:* Por favor, envie a foto/PDF do comprovante junto com esta mensagem.`;
 
             const url = `https://wa.me/5583998765554?text=${encodeURIComponent(texto)}`;
             window.open(url, '_blank');
