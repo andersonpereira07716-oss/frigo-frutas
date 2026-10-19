@@ -99,7 +99,7 @@
                     <div class="flex justify-between text-sm font-black text-gray-900 pt-1 border-t"><span>Total:</span> <span id="val-total" class="text-brand-green">R$ 0,00</span></div>
                 </div>
 
-                <button onclick="enviarPedidoEPainel()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3.5 rounded-xl text-xs shadow-md flex items-center justify-center gap-2">
+                <button onclick="enviarPedidoEPainel()" id="btn-confirmar" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3.5 rounded-xl text-xs shadow-md flex items-center justify-center gap-2">
                     <i class="fa-brands fa-whatsapp text-base"></i> Confirmar Pedido e Enviar
                 </button>
             </div>
@@ -182,7 +182,11 @@
             const nome = document.getElementById('cliente-nome').value.trim();
             const fone = document.getElementById('cliente-fone').value.trim();
             if (!nome || !fone) return alert('Por favor, preencha o seu Nome e WhatsApp!');
-            if (carrinho.length === 0) return alert('Carrinho vazio.');
+            if (carrinho.length === 0) return alert('Seu carrinho está vazio.');
+
+            const btn = document.getElementById('btn-confirmar');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando pedido...';
 
             const bairroSelect = document.getElementById('select-bairro');
             const bairroTexto = bairroSelect.options[bairroSelect.selectedIndex].text;
@@ -192,28 +196,32 @@
 
             const resumoItens = carrinho.map(i => `${i.qtd}x ${i.nome} (R$ ${(i.preco * i.qtd).toFixed(2)})`).join(', ');
 
-            // Salva no Banco de Dados para aparecer no Site
-            try {
-                await supabaseClient.from('pedidos').insert([{
-                    cliente_nome: nome,
-                    cliente_fone: fone,
-                    bairro: bairroTexto,
-                    pagamento: formaPag,
-                    itens: resumoItens,
-                    total: total,
-                    status: 'Pendente'
-                }]);
-            } catch (e) {
-                console.error("Erro ao registrar pedido:", e);
+            // Salva na tabela do Supabase com tratamento explícito de erros
+            const { error } = await supabaseClient.from('pedidos').insert([{
+                cliente_nome: nome,
+                cliente_fone: fone,
+                bairro: bairroTexto,
+                pagamento: formaPag,
+                itens: resumoItens,
+                total: total,
+                status: 'Pendente'
+            }]);
+
+            if (error) {
+                console.error("Erro ao inserir pedido:", error);
+                alert("Aviso: O pedido será enviado ao WhatsApp, mas certifique-se de executar o comando SQL no Supabase para visualizar no Painel!");
             }
 
-            // Envia para o WhatsApp
+            // Envia mensagem formatada para o WhatsApp
             let texto = `🛒 *NOVO PEDIDO - FRIGO FRUTAS*\n\n`;
             texto += `👤 *Cliente:* ${nome}\n📞 *WhatsApp:* ${fone}\n📍 *Bairro:* ${bairroTexto}\n💳 *Pagamento:* ${formaPag}\n\n*Itens:*\n`;
             carrinho.forEach(i => texto += `• ${i.qtd}x ${i.nome}\n`);
             texto += `\n💰 *TOTAL:* *R$ ${total.toFixed(2)}*`;
 
             window.open(`https://wa.me/5583998765554?text=` + encodeURIComponent(texto), '_blank');
+            
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-brands fa-whatsapp text-base"></i> Confirmar Pedido e Enviar';
         }
 
         window.onload = () => renderizarProdutos(produtosGlobais);
