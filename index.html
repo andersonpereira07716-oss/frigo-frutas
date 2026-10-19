@@ -133,7 +133,7 @@
         </div>
     </div>
 
-    <!-- Modal do Carrinho com QR Code e Pix -->
+    <!-- Modal do Carrinho -->
     <div id="modal-carrinho" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 bg-gray-50 border-b flex items-center justify-between">
@@ -158,30 +158,41 @@
                 <div>
                     <label class="block text-[11px] font-bold text-gray-700 mb-1">Forma de Pagamento:</label>
                     <select id="select-pagamento" onchange="alterarFormaPagamento()" class="w-full bg-white border border-gray-200 rounded-xl p-2.5 text-xs font-medium">
-                        <option value="pix">Pix (Chave da loja + QR Code)</option>
+                        <option value="pix">Pix (QR Code & Chave Copia/Cola)</option>
                         <option value="cartao_maquininha">Cartão de Crédito / Débito (Na entrega)</option>
                         <option value="dinheiro">Dinheiro (Em espécie)</option>
                     </select>
                 </div>
 
-                <!-- Box Pix com QR Code Dinamico e Chave Copia e Cola -->
-                <div id="box-pix" class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs space-y-3">
-                    <div class="text-center space-y-1">
-                        <span class="text-[10px] bg-emerald-200 text-emerald-900 font-black px-2 py-0.5 rounded-full uppercase">Pague via QR Code ou Chave</span>
-                        <div class="flex justify-center pt-1">
-                            <img id="qrcode-pix" src="" alt="QR Code Pix" class="w-32 h-32 rounded-xl border border-emerald-300 shadow-sm bg-white p-1">
+                <!-- Box Pix Ultra Profissional -->
+                <div id="box-pix" class="bg-white border-2 border-emerald-500/30 rounded-2xl p-4 text-xs space-y-3 shadow-sm">
+                    <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+                        <span class="font-extrabold text-emerald-800 flex items-center gap-1.5 text-xs">
+                            <i class="fa-brands fa-pix text-emerald-600 text-sm"></i> Pagamento Instantâneo Pix
+                        </span>
+                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Automático</span>
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center space-y-2 py-1">
+                        <div class="bg-white p-2 rounded-2xl border border-gray-200 shadow-sm">
+                            <img id="qrcode-pix" src="" alt="QR Code Pix" class="w-36 h-36 rounded-xl object-contain">
                         </div>
+                        <p class="text-[11px] text-gray-500 font-medium">Aponte a câmera do seu banco para pagar</p>
                     </div>
                     
-                    <div class="flex items-center justify-between text-emerald-900 font-bold border-t border-emerald-200 pt-2">
-                        <span><i class="fa-solid fa-pix text-emerald-600"></i> Chave Pix (Telefone):</span>
-                        <button onclick="copiarChavePix()" class="text-[10px] bg-brand-green text-white px-2 py-1 rounded-lg font-extrabold hover:bg-emerald-700 transition">Copiar Chave</button>
+                    <div class="space-y-1 bg-gray-50 p-2.5 rounded-xl border border-gray-200">
+                        <div class="flex items-center justify-between text-gray-700 font-bold">
+                            <span class="text-[11px]">Chave Pix (Telefone):</span>
+                            <button id="btn-copiar" onclick="copiarChavePix()" class="text-[10px] bg-brand-green text-white px-2.5 py-1 rounded-lg font-extrabold hover:bg-emerald-700 transition flex items-center gap-1">
+                                <i class="fa-regular fa-copy"></i> Copiar Chave
+                            </button>
+                        </div>
+                        <p id="chave-pix-val" class="font-mono text-gray-900 font-black bg-white p-2 rounded border border-gray-200 text-center tracking-wider text-sm">83998765554</p>
                     </div>
-                    <p id="chave-pix-val" class="font-mono text-gray-800 font-bold bg-white p-1.5 rounded border border-emerald-100 text-center">83998765554</p>
                     
-                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-[10px] text-amber-800 flex items-start gap-1.5">
-                        <i class="fa-solid fa-circle-info text-amber-600 mt-0.5"></i>
-                        <span><strong>Atenção:</strong> Após realizar o pagamento via Pix, clique no botão verde abaixo e <strong>anexe o comprovante</strong> no WhatsApp para liberarmos o seu pedido!</span>
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-[11px] text-amber-900 flex items-start gap-2">
+                        <i class="fa-solid fa-circle-exclamation text-amber-600 mt-0.5 text-sm"></i>
+                        <span><strong>Próximo passo:</strong> Após efetuar o Pix, clique no botão abaixo para enviar o pedido e <strong>anexe o comprovante</strong> no WhatsApp da loja!</span>
                     </div>
                 </div>
 
@@ -202,7 +213,7 @@
                     <div class="flex justify-between text-sm font-black text-gray-900 pt-1 border-t"><span>Total:</span> <span id="val-total" class="text-brand-green">R$ 0,00</span></div>
                 </div>
 
-                <button onclick="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs shadow-md flex items-center justify-center gap-2">
+                <button onclick="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3.5 rounded-xl text-xs shadow-md flex items-center justify-center gap-2 transition active:scale-95">
                     <i class="fa-brands fa-whatsapp text-base"></i> Enviar Pedido e Comprovante
                 </button>
             </div>
@@ -349,8 +360,15 @@
         }
 
         function copiarChavePix() {
-            navigator.clipboard.writeText(document.getElementById('chave-pix-val').innerText);
-            alert('Chave Pix copiada com sucesso!');
+            const chave = document.getElementById('chave-pix-val').innerText;
+            navigator.clipboard.writeText(chave);
+            const btn = document.getElementById('btn-copiar');
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Copiado!';
+            btn.className = 'text-[10px] bg-emerald-800 text-white px-2.5 py-1 rounded-lg font-extrabold transition flex items-center gap-1';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-regular fa-copy"></i> Copiar Chave';
+                btn.className = 'text-[10px] bg-brand-green text-white px-2.5 py-1 rounded-lg font-extrabold hover:bg-emerald-700 transition flex items-center gap-1';
+            }, 2500);
         }
 
         function aplicarCupom() {
@@ -376,8 +394,8 @@
             document.getElementById('val-frete').innerText = `R$ ${frete.toFixed(2)}`;
             document.getElementById('val-total').innerText = `R$ ${total.toFixed(2)}`;
 
-            // Atualiza QR Code do Pix com o valor dinâmico total
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('PIX: 83998765554 | Valor: R$ ' + total.toFixed(2))}`;
+            // QR Code gerado dinamicamente para o valor exato
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent('PIX: 83998765554 | Frigo Frutas Patos PB | R$ ' + total.toFixed(2))}`;
             document.getElementById('qrcode-pix').src = qrUrl;
         }
 
