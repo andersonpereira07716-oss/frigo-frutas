@@ -35,13 +35,18 @@
                 <img src="logo.jpg" alt="Logo" class="h-10 w-10 rounded-lg border border-white/20 object-cover bg-white" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=100&q=80';">
                 <div>
                     <h1 class="font-extrabold text-sm tracking-wide leading-tight">Frigo Frutas</h1>
-                    <div class="text-[10px] text-yellow-300 font-medium">Aberto agora • Patos/PB</div>
+                    <div id="status-loja-header" class="text-[10px] text-yellow-300 font-medium">Verificando horário...</div>
                 </div>
             </div>
-            <button onclick="abrirCarrinho()" class="bg-brand-yellow text-gray-900 px-3 py-1.5 rounded-xl font-extrabold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span id="contador-carrinho">0</span>
-            </button>
+            <div class="flex items-center gap-2">
+                <button onclick="abrirHistorico()" class="bg-emerald-700 text-white px-2.5 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1 shadow-sm active:scale-95 transition" title="Meus Pedidos">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </button>
+                <button onclick="abrirCarrinho()" class="bg-brand-yellow text-gray-900 px-3 py-1.5 rounded-xl font-extrabold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span id="contador-carrinho">0</span>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -99,12 +104,25 @@
                 </div>
 
                 <div>
+                    <label class="block text-[11px] font-bold text-gray-700 mb-1">Forma de Agendamento:</label>
+                    <select id="select-agendamento" class="w-full bg-white border border-gray-200 rounded-xl p-2.5 text-xs font-medium">
+                        <option value="Imediato">⚡ Entrega Imediata (Até 1 hora)</option>
+                        <option value="Manha">🌅 Agendar para Manhã (08h às 11h)</option>
+                        <option value="Tarde">☀️ Agendar para Tarde (14h às 17h)</option>
+                    </select>
+                </div>
+
+                <div>
                     <label class="block text-[11px] font-bold text-gray-700 mb-1">Forma de Pagamento:</label>
-                    <select id="select-pagamento" class="w-full bg-white border border-gray-200 rounded-xl p-2.5 text-xs font-medium">
+                    <select id="select-pagamento" onchange="verificarTroco()" class="w-full bg-white border border-gray-200 rounded-xl p-2.5 text-xs font-medium">
                         <option value="Pix">Pix (QR Code / Copia e Cola)</option>
                         <option value="Cartao">Cartão de Crédito/Débito (Na entrega)</option>
                         <option value="Dinheiro">Dinheiro (Espécie)</option>
                     </select>
+                </div>
+
+                <div id="bloco-troco" class="hidden">
+                    <input type="text" id="input-troco" placeholder="Precisa de troco para quanto? (Ex: R$ 50,00)" class="w-full bg-white border border-gray-200 rounded-xl p-2.5 text-xs font-medium">
                 </div>
 
                 <div class="space-y-1 text-xs text-gray-600 pt-2 border-t">
@@ -118,6 +136,17 @@
                     <i class="fa-brands fa-whatsapp text-base"></i> Confirmar Pedido e Enviar
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal Histórico -->
+    <div id="modal-historico" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-4 bg-gray-50 border-b flex items-center justify-between">
+                <h3 class="font-bold text-sm text-gray-900"><i class="fa-solid fa-clock-rotate-left text-brand-green mr-1"></i> Meus Pedidos Anteriores</h3>
+                <button onclick="fecharHistorico()" class="text-gray-400 text-xl font-bold px-2">&times;</button>
+            </div>
+            <div id="lista-historico" class="p-4 overflow-y-auto flex-1 space-y-3"></div>
         </div>
     </div>
 
@@ -139,6 +168,26 @@
 
         let categoriaAtiva = 'todos';
         let carrinho = [];
+
+        function checarStatusLoja() {
+            const agora = new Date();
+            const dia = agora.getDay();
+            const hora = agora.getHours();
+            let aberto = false;
+
+            if (dia >= 1 && dia <= 6) {
+                if (hora >= 7 && hora < 19) aberto = true;
+            } else if (dia === 0) {
+                if (hora >= 7 && hora < 12) aberto = true;
+            }
+
+            const el = document.getElementById('status-loja-header');
+            if (aberto) {
+                el.innerHTML = '<span class="text-emerald-300 font-bold">● Aberto agora • Patos/PB</span>';
+            } else {
+                el.innerHTML = '<span class="text-red-300 font-bold">● Fechado no momento (Agende para amanhã)</span>';
+            }
+        }
 
         function renderizarProdutos(lista) {
             document.getElementById('grid-produtos').innerHTML = lista.map(p => {
@@ -201,17 +250,14 @@
             const item = carrinho.find(i => i.id === id);
             if (item) {
                 item.qtd += delta;
-                if (item.qtd <= 0) {
-                    carrinho = carrinho.filter(i => i.id !== id);
-                }
+                if (item.qtd <= 0) carrinho = carrinho.filter(i => i.id !== id);
             }
             atualizarContador();
             filtrarProdutos();
         }
 
         function atualizarContador() {
-            const totalQtd = carrinho.reduce((a, b) => a + b.qtd, 0);
-            document.getElementById('contador-carrinho').innerText = totalQtd;
+            document.getElementById('contador-carrinho').innerText = carrinho.reduce((a, b) => a + b.qtd, 0);
         }
 
         function abrirCarrinho() {
@@ -232,6 +278,7 @@
                 </div>
             `).join('');
             atualizarTotais();
+            verificarTroco();
             document.getElementById('modal-carrinho').classList.remove('hidden');
         }
 
@@ -243,6 +290,13 @@
             abrirCarrinho();
             atualizarContador();
             filtrarProdutos();
+        }
+
+        function verificarTroco() {
+            const pag = document.getElementById('select-pagamento').value;
+            const bloco = document.getElementById('bloco-troco');
+            if (pag === 'Dinheiro') bloco.classList.remove('hidden');
+            else bloco.classList.add('hidden');
         }
 
         function atualizarTotais() {
@@ -272,34 +326,72 @@
 
             const bairroSelect = document.getElementById('select-bairro');
             const bairroTexto = bairroSelect.options[bairroSelect.selectedIndex].text;
+            const agendamento = document.getElementById('select-agendamento').value;
             const formaPag = document.getElementById('select-pagamento').value;
+            const troco = formaPag === 'Dinheiro' ? document.getElementById('input-troco').value.trim() : '';
+            
             const sub = carrinho.reduce((a, b) => a + (b.preco * b.qtd), 0);
             const desconto = sub * 0.10;
             const total = (sub - desconto) + parseFloat(bairroSelect.value);
             const resumoItens = carrinho.map(i => `${i.qtd}x ${i.nome} (R$ ${(i.preco * i.qtd).toFixed(2)})`).join(', ');
 
+            const pedidoObj = {
+                cliente_nome: nome,
+                cliente_fone: fone,
+                bairro: bairroTexto,
+                pagamento: formaPag + (troco ? ` (Troco para: ${troco})` : ''),
+                agendamento: agendamento,
+                itens: resumoItens,
+                total: total,
+                status: 'Pendente',
+                created_at: new Date().toISOString()
+            };
+
+            // Salva no Histórico local do aparelho
+            let historico = JSON.parse(localStorage.getItem('frigo_historico') || '[]');
+            historico.unshift(pedidoObj);
+            localStorage.setItem('frigo_historico', JSON.stringify(historico));
+
             try {
-                await supabaseClient.from('pedidos').insert([{
-                    cliente_nome: nome,
-                    cliente_fone: fone,
-                    bairro: bairroTexto,
-                    pagamento: formaPag,
-                    itens: resumoItens,
-                    total: total,
-                    status: 'Pendente'
-                }]);
+                await supabaseClient.from('pedidos').insert([pedidoObj]);
             } catch (e) {}
 
-            let texto = `🛒 *NOVO PEDIDO - FRIGO FRUTAS*\n\n👤 *Cliente:* ${nome}\n📞 *WhatsApp:* ${fone}\n📍 *Bairro:* ${bairroTexto}\n💳 *Pagamento:* ${formaPag}\n\n*Itens:*\n`;
+            let texto = `🛒 *NOVO PEDIDO - FRIGO FRUTAS*\n\n👤 *Cliente:* ${nome}\n📞 *WhatsApp:* ${fone}\n📍 *Bairro:* ${bairroTexto}\n⏰ *Entrega:* ${agendamento}\n💳 *Pagamento:* ${formaPag} ${troco ? `\n💵 *Troco para:* ${troco}` : ''}\n\n*Itens:*\n`;
             carrinho.forEach(i => texto += `• ${i.qtd}x ${i.nome}\n`);
             texto += `\n🏷️ *Subtotal:* R$ ${sub.toFixed(2)}\n🎁 *Desconto (FRIGO10):* -R$ ${desconto.toFixed(2)}\n💰 *TOTAL FINAL:* *R$ ${total.toFixed(2)}*`;
 
             window.open(`https://wa.me/5583998765554?text=` + encodeURIComponent(texto), '_blank');
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-brands fa-whatsapp text-base"></i> Confirmar Pedido e Enviar';
+            fecharCarrinho();
         }
 
-        window.onload = () => renderizarProdutos(produtosGlobais);
+        function abrirHistorico() {
+            const historico = JSON.parse(localStorage.getItem('frigo_historico') || '[]');
+            const container = document.getElementById('lista-historico');
+            if (historico.length === 0) {
+                container.innerHTML = '<p class="text-center text-xs text-gray-400 py-10">Nenhum pedido recente neste aparelho.</p>';
+            } else {
+                container.innerHTML = historico.map(p => `
+                    <div class="bg-gray-50 p-3 rounded-2xl border border-gray-100 text-xs space-y-1">
+                        <div class="flex justify-between font-bold text-gray-900">
+                            <span>${p.agendamento}</span>
+                            <span class="text-emerald-700">R$ ${Number(p.total).toFixed(2)}</span>
+                        </div>
+                        <p class="text-gray-600"><strong>Itens:</strong> ${p.itens}</p>
+                        <p class="text-gray-500 text-[10px]">Pagamento: ${p.pagamento} | Bairro: ${p.bairro}</p>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('modal-historico').classList.remove('hidden');
+        }
+
+        function fecharHistorico() { document.getElementById('modal-historico').classList.add('hidden'); }
+
+        window.onload = () => {
+            checarStatusLoja();
+            renderizarProdutos(produtosGlobais);
+        };
     </script>
 </body>
 </html>
