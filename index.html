@@ -35,7 +35,7 @@
                 <img src="logo.jpg" alt="Logo" class="h-10 w-10 rounded-lg border border-white/20 object-cover bg-white" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=100&q=80';">
                 <div>
                     <h1 class="font-extrabold text-sm tracking-wide leading-tight">Frigo Frutas</h1>
-                    <div id="status-loja-header" class="text-[10px] text-yellow-300 font-medium">Verificando horário...</div>
+                    <div id="status-loja-header" class="text-[10px] text-yellow-300 font-medium">A verificar...</div>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -71,7 +71,9 @@
             <button onclick="filtrarCategoria('kit')" id="cat-kit" class="bg-white text-gray-700 font-bold px-3 py-1.5 rounded-xl border border-gray-200 whitespace-nowrap">Kits & Ofertas</button>
         </div>
 
-        <div id="grid-produtos" class="grid grid-cols-2 gap-3 pt-1"></div>
+        <div id="grid-produtos" class="grid grid-cols-2 gap-3 pt-1">
+            <p class="col-span-2 text-center text-xs text-gray-400 py-10"><i class="fa-solid fa-spinner fa-spin"></i> A carregar produtos...</p>
+        </div>
 
         <footer class="pt-8 pb-4 text-center text-xs text-gray-400">
             <p>© Frigo Frutas In House Delivery • Patos/PB</p>
@@ -156,16 +158,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmaWhoY2ttZ3FibmtweWZ1amFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTYyNTQsImV4cCI6MjEwNzg3MjI1NH0.GTCMCrTrfa-1ISEe3eK-bxRz3-8rn_ZRJJqmJzTQDQo';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let produtosGlobais = [
-            { id: 1, nome: "Maçã Fuji (Kg)", preco: 6.99, categoria: "fruta", esgotado: false, imagem: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80" },
-            { id: 2, nome: "Banana Prata (Kg)", preco: 5.49, categoria: "fruta", esgotado: false, imagem: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&q=80" },
-            { id: 3, nome: "Uva Vitória Sem Semente (500g)", preco: 7.90, categoria: "fruta", esgotado: false, imagem: "https://images.unsplash.com/photo-1537640538966-79f369143f8f?auto=format&fit=crop&w=400&q=80" },
-            { id: 4, nome: "Laranja Pera (Kg)", preco: 4.29, categoria: "fruta", esgotado: false, imagem: "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=400&q=80" },
-            { id: 5, nome: "Tomate Comum (Kg)", preco: 6.50, categoria: "verdura", esgotado: false, imagem: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=400&q=80" },
-            { id: 6, nome: "Batata Inglesa (Kg)", preco: 7.20, categoria: "verdura", esgotado: false, imagem: "https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&w=400&q=80" },
-            { id: 7, nome: "Kit Feira Família (Diversos)", preco: 45.00, categoria: "kit", esgotado: false, imagem: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80" }
-        ];
-
+        let produtosGlobais = [];
         let categoriaAtiva = 'todos';
         let carrinho = [];
 
@@ -179,18 +172,46 @@
 
             const el = document.getElementById('status-loja-header');
             if (aberto) el.innerHTML = '<span class="text-emerald-300 font-bold">● Aberto agora • Patos/PB</span>';
-            else el.innerHTML = '<span class="text-red-300 font-bold">● Fechado no momento (Agende para amanhã)</span>';
+            else el.innerHTML = '<span class="text-red-300 font-bold">● Fechado no momento</span>';
+        }
+
+        async function carregarProdutosDoBanco() {
+            try {
+                const { data, error } = await supabaseClient.from('produtos').select('*').order('id', { ascending: true });
+                if (error || !data || data.length === 0) {
+                    produtosGlobais = [
+                        { id: 1, nome: "Maçã Fuji (Kg)", preco: 6.99, categoria: "fruta", esgotado: false, imagem: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80" },
+                        { id: 2, nome: "Banana Prata (Kg)", preco: 5.49, categoria: "fruta", esgotado: false, imagem: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&q=80" },
+                        { id: 3, nome: "Uva Vitória Sem Semente (500g)", preco: 7.90, categoria: "fruta", esgotado: false, imagem: "https://images.unsplash.com/photo-1537640538966-79f369143f8f?auto=format&fit=crop&w=400&q=80" },
+                        { id: 4, nome: "Laranja Pera (Kg)", preco: 4.29, categoria: "fruta", esgotado: false, imagem: "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=400&q=80" },
+                        { id: 5, nome: "Tomate Comum (Kg)", preco: 6.50, categoria: "verdura", esgotado: false, imagem: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=400&q=80" },
+                        { id: 6, nome: "Batata Inglesa (Kg)", preco: 7.20, categoria: "verdura", esgotado: false, imagem: "https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&w=400&q=80" },
+                        { id: 7, nome: "Kit Feira Família (Diversos)", preco: 45.00, categoria: "kit", esgotado: false, imagem: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80" }
+                    ];
+                } else {
+                    produtosGlobais = data;
+                }
+            } catch(e) {
+                produtosGlobais = [];
+            }
+            filtrarProdutos();
         }
 
         function renderizarProdutos(lista) {
-            document.getElementById('grid-produtos').innerHTML = lista.map(p => {
+            const grid = document.getElementById('grid-produtos');
+            if (lista.length === 0) {
+                grid.innerHTML = '<p class="col-span-2 text-center text-xs text-gray-400 py-10">Nenhum produto encontrado nesta categoria.</p>';
+                return;
+            }
+
+            grid.innerHTML = lista.map(p => {
                 const itemCarrinho = carrinho.find(i => i.id === p.id);
                 const qtdNoCarrinho = itemCarrinho ? itemCarrinho.qtd : 0;
 
                 return `
                     <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between ${p.esgotado ? 'opacity-60' : ''}">
                         <div>
-                            <img src="${p.imagem}" class="w-full h-28 object-cover rounded-xl mb-2">
+                            <img src="${p.imagem || 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=400&q=80'}" class="w-full h-28 object-cover rounded-xl mb-2">
                             <h4 class="font-bold text-gray-900 text-xs mb-1 line-clamp-1">${p.nome}</h4>
                             <span class="text-sm font-black text-emerald-700">R$ ${Number(p.preco).toFixed(2)}</span>
                         </div>
@@ -397,7 +418,7 @@
 
         window.onload = () => {
             checarStatusLoja();
-            renderizarProdutos(produtosGlobais);
+            carregarProdutosDoBanco();
         };
     </script>
 </body>
