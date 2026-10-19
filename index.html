@@ -46,16 +46,24 @@
     </header>
 
     <!-- Loja Catálogo -->
-    <main id="view-loja" class="max-w-md mx-auto px-4 pt-3 space-y-3">
+    <main class="max-w-md mx-auto px-4 pt-3 space-y-3">
         <div class="bg-gradient-to-r from-brand-green to-brand-darkGreen text-white p-3.5 rounded-2xl shadow-sm">
             <span class="bg-brand-yellow text-gray-900 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">Hortifrúti Delivery</span>
             <h2 class="text-base font-black mt-1">Frutas e Verduras Frescas</h2>
-            <p class="text-xs text-emerald-100 mt-0.5">Cupom ativo: <strong class="text-brand-yellow">FRIGO10</strong> (10% OFF)</p>
+            <p class="text-xs text-emerald-100 mt-0.5">Cupom ativo: <strong class="text-brand-yellow">FRIGO10</strong> (10% OFF aplicado automático!)</p>
         </div>
 
         <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-gray-400 text-sm"></i>
             <input type="text" id="input-busca" oninput="filtrarProdutos()" placeholder="Pesquisar produto..." class="w-full bg-white pl-10 pr-4 py-2.5 rounded-xl text-xs border border-gray-200 focus:outline-none focus:border-brand-green shadow-sm">
+        </div>
+
+        <!-- Filtros por Categoria -->
+        <div class="flex gap-2 overflow-x-auto pb-1 text-xs no-scrollbar">
+            <button onclick="filtrarCategoria('todos')" id="cat-todos" class="bg-brand-green text-white font-bold px-3 py-1.5 rounded-xl whitespace-nowrap shadow-sm">Todos</button>
+            <button onclick="filtrarCategoria('fruta')" id="cat-fruta" class="bg-white text-gray-700 font-bold px-3 py-1.5 rounded-xl border border-gray-200 whitespace-nowrap">Frutas</button>
+            <button onclick="filtrarCategoria('verdura')" id="cat-verdura" class="bg-white text-gray-700 font-bold px-3 py-1.5 rounded-xl border border-gray-200 whitespace-nowrap">Verduras & Legumes</button>
+            <button onclick="filtrarCategoria('kit')" id="cat-kit" class="bg-white text-gray-700 font-bold px-3 py-1.5 rounded-xl border border-gray-200 whitespace-nowrap">Kits & Ofertas</button>
         </div>
 
         <div id="grid-produtos" class="grid grid-cols-2 gap-3 pt-1"></div>
@@ -101,8 +109,9 @@
 
                 <div class="space-y-1 text-xs text-gray-600 pt-2 border-t">
                     <div class="flex justify-between"><span>Subtotal:</span> <span id="val-subtotal">R$ 0,00</span></div>
+                    <div class="flex justify-between text-emerald-700 font-bold"><span>Desconto Cupom (FRIGO10 - 10%):</span> <span id="val-desconto">- R$ 0,00</span></div>
                     <div class="flex justify-between"><span>Taxa de Entrega:</span> <span id="val-frete">R$ 5,00</span></div>
-                    <div class="flex justify-between text-sm font-black text-gray-900 pt-1 border-t"><span>Total:</span> <span id="val-total" class="text-brand-green">R$ 0,00</span></div>
+                    <div class="flex justify-between text-sm font-black text-gray-900 pt-1 border-t"><span>Total Final:</span> <span id="val-total" class="text-brand-green">R$ 0,00</span></div>
                 </div>
 
                 <button onclick="enviarPedidoEPainel()" id="btn-confirmar" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3.5 rounded-xl text-xs shadow-md flex items-center justify-center gap-2">
@@ -119,40 +128,94 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let produtosGlobais = [
-            { id: 1, nome: "Maçã Fuji (Kg)", preco: 6.99, imagem: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80" },
-            { id: 2, nome: "Banana Prata (Kg)", preco: 5.49, imagem: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&q=80" },
-            { id: 3, nome: "Uva Vitória Sem Semente (500g)", preco: 7.90, imagem: "https://images.unsplash.com/photo-1537640538966-79f369143f8f?auto=format&fit=crop&w=400&q=80" },
-            { id: 4, nome: "Laranja Pera (Kg)", preco: 4.29, imagem: "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=400&q=80" }
+            { id: 1, nome: "Maçã Fuji (Kg)", preco: 6.99, categoria: "fruta", esgotado: false, imagem: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80" },
+            { id: 2, nome: "Banana Prata (Kg)", preco: 5.49, categoria: "fruta", esgotado: false, imagem: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&q=80" },
+            { id: 3, nome: "Uva Vitória Sem Semente (500g)", preco: 7.90, categoria: "fruta", esgotado: false, imagem: "https://images.unsplash.com/photo-1537640538966-79f369143f8f?auto=format&fit=crop&w=400&q=80" },
+            { id: 4, nome: "Laranja Pera (Kg)", preco: 4.29, categoria: "fruta", esgotado: false, imagem: "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=400&q=80" },
+            { id: 5, nome: "Tomate Comum (Kg)", preco: 6.50, categoria: "verdura", esgotado: false, imagem: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=400&q=80" },
+            { id: 6, nome: "Batata Inglesa (Kg)", preco: 7.20, categoria: "verdura", esgotado: false, imagem: "https://images.unsplash.com/photo-1518977676601-b5ff321036b9?auto=format&fit=crop&w=400&q=80" },
+            { id: 7, nome: "Kit Feira Família (Diversos)", preco: 45.00, categoria: "kit", esgotado: false, imagem: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80" }
         ];
 
+        let categoriaAtiva = 'todos';
         let carrinho = [];
 
         function renderizarProdutos(lista) {
-            document.getElementById('grid-produtos').innerHTML = lista.map(p => `
-                <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between">
-                    <div>
-                        <img src="${p.imagem}" class="w-full h-28 object-cover rounded-xl mb-2">
-                        <h4 class="font-bold text-gray-900 text-xs mb-1 line-clamp-1">${p.nome}</h4>
-                        <span class="text-sm font-black text-emerald-700">R$ ${Number(p.preco).toFixed(2)}</span>
+            document.getElementById('grid-produtos').innerHTML = lista.map(p => {
+                const itemCarrinho = carrinho.find(i => i.id === p.id);
+                const qtdNoCarrinho = itemCarrinho ? itemCarrinho.qtd : 0;
+
+                return `
+                    <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between ${p.esgotado ? 'opacity-60' : ''}">
+                        <div>
+                            <img src="${p.imagem}" class="w-full h-28 object-cover rounded-xl mb-2">
+                            <h4 class="font-bold text-gray-900 text-xs mb-1 line-clamp-1">${p.nome}</h4>
+                            <span class="text-sm font-black text-emerald-700">R$ ${Number(p.preco).toFixed(2)}</span>
+                        </div>
+                        ${p.esgotado 
+                            ? `<button disabled class="mt-2 w-full bg-gray-200 text-gray-500 font-bold py-2 rounded-xl text-[11px]">Esgotado</button>`
+                            : qtdNoCarrinho === 0
+                                ? `<button onclick="adicionarCarrinho(${p.id})" class="mt-2 w-full bg-brand-green text-white font-bold py-2 rounded-xl text-[11px] shadow-sm">+ Adicionar</button>`
+                                : `<div class="mt-2 flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl p-1">
+                                       <button onclick="mudarQtdVitrine(${p.id}, -1)" class="w-7 h-7 bg-white text-brand-green rounded-lg font-black shadow-sm">-</button>
+                                       <span class="font-black text-xs text-brand-green">${qtdNoCarrinho}</span>
+                                       <button onclick="mudarQtdVitrine(${p.id}, 1)" class="w-7 h-7 bg-brand-green text-white rounded-lg font-black shadow-sm">+</button>
+                                   </div>`
+                        }
                     </div>
-                    <button onclick="adicionarCarrinho(${p.id})" class="mt-2 w-full bg-brand-green text-white font-bold py-2 rounded-xl text-[11px] shadow-sm">+ Adicionar</button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
+        }
+
+        function filtrarCategoria(cat) {
+            categoriaAtiva = cat;
+            ['todos', 'fruta', 'verdura', 'kit'].forEach(c => {
+                const el = document.getElementById(`cat-${c}`);
+                if (el) {
+                    if (c === cat) el.className = 'bg-brand-green text-white font-bold px-3 py-1.5 rounded-xl whitespace-nowrap shadow-sm';
+                    else el.className = 'bg-white text-gray-700 font-bold px-3 py-1.5 rounded-xl border border-gray-200 whitespace-nowrap';
+                }
+            });
+            filtrarProdutos();
         }
 
         function filtrarProdutos() {
             const busca = document.getElementById('input-busca').value.toLowerCase();
-            renderizarProdutos(produtosGlobais.filter(p => p.nome.toLowerCase().includes(busca)));
+            const filtrados = produtosGlobais.filter(p => {
+                const bateCategoria = categoriaAtiva === 'todos' || p.categoria === categoriaAtiva;
+                const bateBusca = p.nome.toLowerCase().includes(busca);
+                return bateCategoria && bateBusca;
+            });
+            renderizarProdutos(filtrados);
         }
 
         function adicionarCarrinho(id) {
             const p = produtosGlobais.find(i => i.id === id);
             const item = carrinho.find(i => i.id === id);
             if (item) item.qtd++; else carrinho.push({ id: p.id, nome: p.nome, preco: p.preco, qtd: 1 });
-            document.getElementById('contador-carrinho').innerText = carrinho.reduce((a, b) => a + b.qtd, 0);
+            atualizarContador();
+            filtrarProdutos();
+        }
+
+        function mudarQtdVitrine(id, delta) {
+            const item = carrinho.find(i => i.id === id);
+            if (item) {
+                item.qtd += delta;
+                if (item.qtd <= 0) {
+                    carrinho = carrinho.filter(i => i.id !== id);
+                }
+            }
+            atualizarContador();
+            filtrarProdutos();
+        }
+
+        function atualizarContador() {
+            const totalQtd = carrinho.reduce((a, b) => a + b.qtd, 0);
+            document.getElementById('contador-carrinho').innerText = totalQtd;
         }
 
         function abrirCarrinho() {
+            // Recupera dados salvos no aparelho do cliente
             document.getElementById('cliente-nome').value = localStorage.getItem('frigo_nome') || '';
             document.getElementById('cliente-fone').value = localStorage.getItem('frigo_fone') || '';
             
@@ -163,9 +226,9 @@
                         <p class="text-gray-500 text-[10px]">R$ ${Number(i.preco).toFixed(2)} un</p>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="mudarQtd(${idx}, -1)" class="w-6 h-6 bg-gray-100 rounded-lg font-bold">-</button>
+                        <button onclick="mudarQtdCarrinho(${idx}, -1)" class="w-6 h-6 bg-gray-100 rounded-lg font-bold">-</button>
                         <span class="font-bold text-xs">${i.qtd}</span>
-                        <button onclick="mudarQtd(${idx}, 1)" class="w-6 h-6 bg-gray-100 rounded-lg font-bold">+</button>
+                        <button onclick="mudarQtdCarrinho(${idx}, 1)" class="w-6 h-6 bg-gray-100 rounded-lg font-bold">+</button>
                     </div>
                 </div>
             `).join('');
@@ -175,19 +238,24 @@
 
         function fecharCarrinho() { document.getElementById('modal-carrinho').classList.add('hidden'); }
 
-        function mudarQtd(idx, delta) {
+        function mudarQtdCarrinho(idx, delta) {
             carrinho[idx].qtd += delta;
             if (carrinho[idx].qtd <= 0) carrinho.splice(idx, 1);
             abrirCarrinho();
-            document.getElementById('contador-carrinho').innerText = carrinho.reduce((a, b) => a + b.qtd, 0);
+            atualizarContador();
+            filtrarProdutos();
         }
 
         function atualizarTotais() {
             const sub = carrinho.reduce((a, b) => a + (b.preco * b.qtd), 0);
+            const desconto = sub * 0.10; // Cupom FRIGO10 (10% OFF automático)
             const frete = parseFloat(document.getElementById('select-bairro').value);
+            const total = (sub - desconto) + frete;
+
             document.getElementById('val-subtotal').innerText = `R$ ${sub.toFixed(2)}`;
+            document.getElementById('val-desconto').innerText = `- R$ ${desconto.toFixed(2)}`;
             document.getElementById('val-frete').innerText = `R$ ${frete.toFixed(2)}`;
-            document.getElementById('val-total').innerText = `R$ ${(sub + frete).toFixed(2)}`;
+            document.getElementById('val-total').innerText = `R$ ${total.toFixed(2)}`;
         }
 
         async function enviarPedidoEPainel() {
@@ -196,17 +264,20 @@
             if (!nome || !fone) return alert('Por favor, preencha seu Nome e WhatsApp!');
             if (carrinho.length === 0) return alert('Seu carrinho está vazio.');
 
+            // Salva dados no aparelho para as próximas compras
             localStorage.setItem('frigo_nome', nome);
             localStorage.setItem('frigo_fone', fone);
 
             const btn = document.getElementById('btn-confirmar');
             btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando pedido...';
 
             const bairroSelect = document.getElementById('select-bairro');
             const bairroTexto = bairroSelect.options[bairroSelect.selectedIndex].text;
             const formaPag = document.getElementById('select-pagamento').value;
             const sub = carrinho.reduce((a, b) => a + (b.preco * b.qtd), 0);
-            const total = sub + parseFloat(bairroSelect.value);
+            const desconto = sub * 0.10;
+            const total = (sub - desconto) + parseFloat(bairroSelect.value);
             const resumoItens = carrinho.map(i => `${i.qtd}x ${i.nome} (R$ ${(i.preco * i.qtd).toFixed(2)})`).join(', ');
 
             try {
@@ -223,10 +294,11 @@
 
             let texto = `🛒 *NOVO PEDIDO - FRIGO FRUTAS*\n\n👤 *Cliente:* ${nome}\n📞 *WhatsApp:* ${fone}\n📍 *Bairro:* ${bairroTexto}\n💳 *Pagamento:* ${formaPag}\n\n*Itens:*\n`;
             carrinho.forEach(i => texto += `• ${i.qtd}x ${i.nome}\n`);
-            texto += `\n💰 *TOTAL:* *R$ ${total.toFixed(2)}*`;
+            texto += `\n🏷️ *Subtotal:* R$ ${sub.toFixed(2)}\n🎁 *Desconto (FRIGO10):* -R$ ${desconto.toFixed(2)}\n💰 *TOTAL FINAL:* *R$ ${total.toFixed(2)}*`;
 
             window.open(`https://wa.me/5583998765554?text=` + encodeURIComponent(texto), '_blank');
             btn.disabled = false;
+            btn.innerHTML = '<i class="fa-brands fa-whatsapp text-base"></i> Confirmar Pedido e Enviar';
         }
 
         window.onload = () => renderizarProdutos(produtosGlobais);
