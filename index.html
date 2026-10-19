@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Frigo Frutas | Delivery</title>
+    <!-- PWA Configs -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00875A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="logo.jpg">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -108,6 +115,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // Registra o Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW Fail', err));
+          });
+        }
+
         const SUPABASE_URL = 'https://cfihhckmgqbnkpyfujam.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmaWhoY2ttZ3FibmtweWZ1amFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTYyNTQsImV4cCI6MjEwNzg3MjI1NH0.GTCMCrTrfa-1ISEe3eK-bxRz3-8rn_ZRJJqmJzTQDQo';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -196,7 +210,6 @@
 
             const resumoItens = carrinho.map(i => `${i.qtd}x ${i.nome} (R$ ${(i.preco * i.qtd).toFixed(2)})`).join(', ');
 
-            // Salva na tabela do Supabase de forma silenciosa
             try {
                 await supabaseClient.from('pedidos').insert([{
                     cliente_nome: nome,
@@ -211,7 +224,6 @@
                 console.error("Erro ao salvar no Supabase:", e);
             }
 
-            // Envia mensagem formatada para o WhatsApp
             let texto = `🛒 *NOVO PEDIDO - FRIGO FRUTAS*\n\n`;
             texto += `👤 *Cliente:* ${nome}\n📞 *WhatsApp:* ${fone}\n📍 *Bairro:* ${bairroTexto}\n💳 *Pagamento:* ${formaPag}\n\n*Itens:*\n`;
             carrinho.forEach(i => texto += `• ${i.qtd}x ${i.nome}\n`);
