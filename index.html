@@ -196,20 +196,19 @@
 
             const resumoItens = carrinho.map(i => `${i.qtd}x ${i.nome} (R$ ${(i.preco * i.qtd).toFixed(2)})`).join(', ');
 
-            // Salva na tabela do Supabase com tratamento explícito de erros
-            const { error } = await supabaseClient.from('pedidos').insert([{
-                cliente_nome: nome,
-                cliente_fone: fone,
-                bairro: bairroTexto,
-                pagamento: formaPag,
-                itens: resumoItens,
-                total: total,
-                status: 'Pendente'
-            }]);
-
-            if (error) {
-                console.error("Erro ao inserir pedido:", error);
-                alert("Aviso: O pedido será enviado ao WhatsApp, mas certifique-se de executar o comando SQL no Supabase para visualizar no Painel!");
+            // Salva na tabela do Supabase de forma silenciosa
+            try {
+                await supabaseClient.from('pedidos').insert([{
+                    cliente_nome: nome,
+                    cliente_fone: fone,
+                    bairro: bairroTexto,
+                    pagamento: formaPag,
+                    itens: resumoItens,
+                    total: total,
+                    status: 'Pendente'
+                }]);
+            } catch (e) {
+                console.error("Erro ao salvar no Supabase:", e);
             }
 
             // Envia mensagem formatada para o WhatsApp
