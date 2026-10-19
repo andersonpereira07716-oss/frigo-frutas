@@ -133,7 +133,7 @@
         </div>
     </div>
 
-    <!-- Modal do Carrinho -->
+    <!-- Modal do Carrinho com QR Code e Pix -->
     <div id="modal-carrinho" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 bg-gray-50 border-b flex items-center justify-between">
@@ -158,18 +158,31 @@
                 <div>
                     <label class="block text-[11px] font-bold text-gray-700 mb-1">Forma de Pagamento:</label>
                     <select id="select-pagamento" onchange="alterarFormaPagamento()" class="w-full bg-white border border-gray-200 rounded-xl p-2.5 text-xs font-medium">
-                        <option value="pix">Pix (Chave da loja)</option>
+                        <option value="pix">Pix (Chave da loja + QR Code)</option>
                         <option value="cartao_maquininha">Cartão de Crédito / Débito (Na entrega)</option>
                         <option value="dinheiro">Dinheiro (Em espécie)</option>
                     </select>
                 </div>
 
-                <div id="box-pix" class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs space-y-2">
-                    <div class="flex items-center justify-between text-emerald-900 font-bold">
-                        <span><i class="fa-solid fa-pix text-emerald-600"></i> Chave Pix (Telefone):</span>
-                        <button onclick="copiarChavePix()" class="text-[10px] bg-brand-green text-white px-2 py-1 rounded-lg font-extrabold">Copiar Chave</button>
+                <!-- Box Pix com QR Code Dinamico e Chave Copia e Cola -->
+                <div id="box-pix" class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs space-y-3">
+                    <div class="text-center space-y-1">
+                        <span class="text-[10px] bg-emerald-200 text-emerald-900 font-black px-2 py-0.5 rounded-full uppercase">Pague via QR Code ou Chave</span>
+                        <div class="flex justify-center pt-1">
+                            <img id="qrcode-pix" src="" alt="QR Code Pix" class="w-32 h-32 rounded-xl border border-emerald-300 shadow-sm bg-white p-1">
+                        </div>
                     </div>
-                    <p id="chave-pix-val" class="font-mono text-gray-800 font-bold bg-white p-1.5 rounded border text-center">83998765554</p>
+                    
+                    <div class="flex items-center justify-between text-emerald-900 font-bold border-t border-emerald-200 pt-2">
+                        <span><i class="fa-solid fa-pix text-emerald-600"></i> Chave Pix (Telefone):</span>
+                        <button onclick="copiarChavePix()" class="text-[10px] bg-brand-green text-white px-2 py-1 rounded-lg font-extrabold hover:bg-emerald-700 transition">Copiar Chave</button>
+                    </div>
+                    <p id="chave-pix-val" class="font-mono text-gray-800 font-bold bg-white p-1.5 rounded border border-emerald-100 text-center">83998765554</p>
+                    
+                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-[10px] text-amber-800 flex items-start gap-1.5">
+                        <i class="fa-solid fa-circle-info text-amber-600 mt-0.5"></i>
+                        <span><strong>Atenção:</strong> Após realizar o pagamento via Pix, clique no botão verde abaixo e <strong>anexe o comprovante</strong> no WhatsApp para liberarmos o seu pedido!</span>
+                    </div>
                 </div>
 
                 <div id="box-troco" class="hidden">
@@ -190,7 +203,7 @@
                 </div>
 
                 <button onclick="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs shadow-md flex items-center justify-center gap-2">
-                    <i class="fa-brands fa-whatsapp text-base"></i> Enviar Pedido via WhatsApp
+                    <i class="fa-brands fa-whatsapp text-base"></i> Enviar Pedido e Comprovante
                 </button>
             </div>
         </div>
@@ -337,7 +350,7 @@
 
         function copiarChavePix() {
             navigator.clipboard.writeText(document.getElementById('chave-pix-val').innerText);
-            alert('Chave Pix copiada!');
+            alert('Chave Pix copiada com sucesso!');
         }
 
         function aplicarCupom() {
@@ -346,7 +359,7 @@
                 descontoAplicado = subtotal * 0.10;
                 document.getElementById('linha-desconto').classList.remove('hidden');
                 document.getElementById('val-desconto').innerText = `-R$ ${descontoAplicado.toFixed(2)}`;
-                alert('Cupom aplicado!');
+                alert('Cupom aplicado com sucesso!');
             } else {
                 descontoAplicado = 0;
                 document.getElementById('linha-desconto').classList.add('hidden');
@@ -362,10 +375,15 @@
             document.getElementById('val-subtotal').innerText = `R$ ${subtotal.toFixed(2)}`;
             document.getElementById('val-frete').innerText = `R$ ${frete.toFixed(2)}`;
             document.getElementById('val-total').innerText = `R$ ${total.toFixed(2)}`;
+
+            // Atualiza QR Code do Pix com o valor dinâmico total
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('PIX: 83998765554 | Valor: R$ ' + total.toFixed(2))}`;
+            document.getElementById('qrcode-pix').src = qrUrl;
         }
 
         function enviarPedidoWhatsApp() {
             if (carrinho.length === 0) return alert('Carrinho vazio.');
+            const formaPag = document.getElementById('select-pagamento').value;
             const bairro = document.getElementById('select-bairro');
             const subtotal = carrinho.reduce((sum, i) => sum + (i.preco * i.qtd), 0);
             const total = Math.max(0, subtotal - descontoAplicado) + parseFloat(bairro.value);
@@ -373,12 +391,13 @@
             let texto = `🛒 *NOVO PEDIDO - FRIGO FRUTAS*\n\n`;
             carrinho.forEach(i => texto += `• ${i.qtd}x ${i.nome} (R$ ${(i.preco * i.qtd).toFixed(2)})\n`);
             texto += `\n📍 *Bairro:* ${bairro.options[bairro.selectedIndex].text}`;
-            texto += `\n💰 *TOTAL:* *R$ ${total.toFixed(2)}*\n\nEnviado via App Patos/PB.`;
+            texto += `\n💳 *Pagamento:* ${formaPag === 'pix' ? 'Pix (Chave: 83998765554) - *COMPROVANTE EM ANEXO*' : (formaPag === 'dinheiro' ? 'Dinheiro' : 'Cartão na Entrega')}`;
+            texto += `\n💰 *TOTAL:* *R$ ${total.toFixed(2)}*\n\n📌 *Estou enviando o comprovante Pix em anexo nesta conversa!*`;
 
             window.open(`https://wa.me/5583998765554?text=${encodeURIComponent(texto)}`, '_blank');
         }
 
-        // Funcoes do Painel Admin na mesma pagina
+        // Funcoes do Painel Admin
         async function abrirModalAdmin() {
             document.getElementById('view-loja').classList.add('hidden');
             document.getElementById('view-admin').classList.remove('hidden');
@@ -429,14 +448,14 @@
             const preco = parseFloat(document.getElementById('novo-preco').value);
             const imagem = document.getElementById('novo-imagem').value;
             await supabaseClient.from('produtos').insert([{ nome, preco, imagem, categoria: 'Frutas', disponivel: true }]);
-            alert('Produto cadastrado!');
+            alert('Produto cadastrado com sucesso!');
             e.target.reset();
             carregarProdutosAdmin();
             sincronizarSupabase();
         }
 
         async function excluirProdutoAdmin(id) {
-            if (confirm('Apagar produto?')) {
+            if (confirm('Deseja excluir este produto do catálogo?')) {
                 await supabaseClient.from('produtos').delete().eq('id', id);
                 carregarProdutosAdmin();
                 sincronizarSupabase();
