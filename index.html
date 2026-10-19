@@ -116,11 +116,25 @@
 
                 <div>
                     <label class="block text-[11px] font-bold text-gray-700 mb-1">Forma de Pagamento:</label>
-                    <select id="select-pagamento" onchange="verificarTroco()" class="w-full bg-white border border-gray-200 rounded-xl p-2.5 text-xs font-medium">
+                    <select id="select-pagamento" onchange="verificarFormaPagamento()" class="w-full bg-white border border-gray-200 rounded-xl p-2.5 text-xs font-medium">
                         <option value="Pix">Pix (QR Code / Copia e Cola)</option>
                         <option value="Cartao">Cartão de Crédito/Débito (Na entrega)</option>
                         <option value="Dinheiro">Dinheiro (Espécie)</option>
                     </select>
+                </div>
+
+                <!-- BLOCO PIX COPIA E COLA -->
+                <div id="bloco-pix" class="bg-emerald-50 p-3 rounded-2xl border border-emerald-200 space-y-1.5">
+                    <p class="text-[11px] font-bold text-emerald-900 flex items-center justify-between">
+                        <span><i class="fa-brands fa-pix text-emerald-600"></i> Chave Pix da Loja:</span>
+                        <span class="text-[10px] bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded font-black">Chave Celular</span>
+                    </p>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="chave-pix-valor" value="83998765554" readonly class="flex-1 bg-white border border-emerald-300 rounded-xl p-2 text-xs font-black text-emerald-800 text-center">
+                        <button onclick="copiarChavePix()" class="bg-brand-green text-white font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 active:scale-95 transition">
+                            <i class="fa-solid fa-copy"></i> Copiar
+                        </button>
+                    </div>
                 </div>
 
                 <div id="bloco-troco" class="hidden">
@@ -292,7 +306,7 @@
                 </div>
             `).join('');
             atualizarTotais();
-            verificarTroco();
+            verificarFormaPagamento();
             document.getElementById('modal-carrinho').classList.remove('hidden');
         }
 
@@ -306,11 +320,22 @@
             filtrarProdutos();
         }
 
-        function verificarTroco() {
+        function verificarFormaPagamento() {
             const pag = document.getElementById('select-pagamento').value;
-            const bloco = document.getElementById('bloco-troco');
-            if (pag === 'Dinheiro') bloco.classList.remove('hidden');
-            else bloco.classList.add('hidden');
+            const blocoTroco = document.getElementById('bloco-troco');
+            const blocoPix = document.getElementById('bloco-pix');
+
+            if (pag === 'Dinheiro') blocoTroco.classList.remove('hidden');
+            else blocoTroco.classList.add('hidden');
+
+            if (pag === 'Pix') blocoPix.classList.remove('hidden');
+            else blocoPix.classList.add('hidden');
+        }
+
+        function copiarChavePix() {
+            const chave = document.getElementById('chave-pix-valor').value;
+            navigator.clipboard.writeText(chave);
+            alert('Chave Pix (83998765554) copiada com sucesso!');
         }
 
         function atualizarTotais() {
